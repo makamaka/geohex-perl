@@ -6,8 +6,7 @@ use Carp;
 
 use POSIX       qw/floor ceil/;
 use Math::Round qw/round/;
-use Math::Trig qw( pi tan );
-use Geo::Proj4;
+use Math::Trig qw( tan atan );
 
 our $VERSION = '0.02_01';
 use vars qw(@ISA @EXPORT);
@@ -17,15 +16,15 @@ use Exporter;
 
 # Constants
 
+use constant PI => Math::Trig::pi();
+
 my $h_key       = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 my @h_key       = split( //, $h_key );
 my $h_base      = 20037508.3;
-my $h_deg       = pi() * ( 30.0 / 180.0 );
+my $h_deg       = PI * ( 30.0 / 180.0 );
 my $h_k         = tan($h_deg);
 my $h_range     = 21;
 
-my $mproj = Geo::Proj4->new("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=\@null +no_defs");
-my $wproj = Geo::Proj4->new("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs");
 
 sub latlng2geohex {
     return getZoneByLocation(@_)->{code};
@@ -191,10 +190,18 @@ sub __setHexSize {
 }
 
 sub __loc2xy {
-    return $wproj->transform($mproj,\@_);
+    my ( $lon, $lat ) = @_;
+    my $x = $lon * $h_base / 180;
+    my $y = $h_base * log( tan( ( 90 + $lat ) * PI / 360) ) / ( PI / 180 ) / 180;
+    return [ $x, $y ];
 }
+
 sub __xy2loc {
-    return $mproj->transform($wproj,\@_);
+    my ( $x, $y ) = @_;
+    my $lon = ( $x / $h_base ) * 180;
+    my $lat = ( $y / $h_base ) * 180;
+    $lat = 180 / PI * ( 2 * atan( exp( $lat * PI / 180 ) ) - PI / 2 );
+    return [ $lon, $lat ];
 }
 
 1; # Magic true value required at end of module
