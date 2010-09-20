@@ -9,7 +9,7 @@ use Math::Round qw/round/;
 use Math::Trig qw( pi tan );
 use Geo::Proj4;
 
-use version; our $VERSION = qv('0.0.2');
+our $VERSION = '0.02_01';
 use vars qw(@ISA @EXPORT);
 use Exporter;
 @ISA    = qw(Exporter);
