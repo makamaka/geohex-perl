@@ -12,7 +12,8 @@ plan tests => scalar( @data );
 
 for my $d ( @data ) {
     my ( $lat, $lng, $lev, $code ) = @$d;
-    is( latlng2geohex( $lat, $lng, $lev ), $code, $code );
+    my ( $center_lat, $center_lng, $decoded_lev ) = geohex2latlng( $code );
+    is( latlng2geohex( $center_lat, $center_lng, $decoded_lev ), $code, $code );
 }
 
 
