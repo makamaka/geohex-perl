@@ -166,8 +166,8 @@ sub getZoneByCode {
         $h_x = index($h_key, $_code[1]) * 60.0      + index($h_key, $_code[3]);
         $h_y = index($h_key, $_code[2]) * 60.0      + index($h_key, $_code[4]);
     } else {
-        $h_x = index($h_key, $_code[1]) * 60.0;
-        $h_y = index($h_key, $_code[2]) * 60.0;
+        $h_x = index($h_key, $_code[1]);
+        $h_y = index($h_key, $_code[2]);
     }
 
     $h_x        = ( $h_x % 2 ) ? -($h_x - 1.0) / 2.0 : $h_x / 2.0;
