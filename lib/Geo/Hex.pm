@@ -14,13 +14,15 @@ use Exporter;
 @ISA    = qw(Exporter);
 @EXPORT = qw(latlng2geohex geohex2latlng getZoneByLocation getZoneByCode);
 
+# code from http://geohex.net/hex_v2.03_core.js
+
 # Constants
 
 use constant PI => Math::Trig::pi();
 
 my $h_key       = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 my @h_key       = split( //, $h_key );
-my $h_base      = 20037508.3;
+my $h_base      = 20037508.34;
 my $h_deg       = PI * ( 30.0 / 180.0 );
 my $h_k         = tan($h_deg);
 my $h_range     = 21;
@@ -140,8 +142,7 @@ sub getZoneByCode {
     my $zone     = {};
     my $level    = index($h_key, $_code[0]);
     my $scl      = $level;
-    my $h_base   = 20037508.3;
-    my $h_size   = $h_base / 2.0 ** $level / 3.0;
+    my $h_size   = __setHexSize( $level ); #$h_base / 2.0 ** $level / 3.0;
     my $unit_x   = 6.0 * $h_size;
     my $unit_y   = 6.0 * $h_size * $h_k;
     my $h_max    = round($h_base / $unit_x + $h_base / $unit_y);
