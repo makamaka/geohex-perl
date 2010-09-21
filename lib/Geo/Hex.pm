@@ -142,7 +142,7 @@ sub getZoneByCode {
     my $zone     = {};
     my $level    = index($h_key, $_code[0]);
     my $scl      = $level;
-    my $h_size   = __setHexSize( $level ); #$h_base / 2.0 ** $level / 3.0;
+    my $h_size   = __setHexSize( $level );
     my $unit_x   = 6.0 * $h_size;
     my $unit_y   = 6.0 * $h_size * $h_k;
     my $h_max    = round($h_base / $unit_x + $h_base / $unit_y);
@@ -183,6 +183,59 @@ sub getZoneByCode {
     $zone->{lon}  = $h_lon;
     $zone->{x}    = $h_x;
     $zone->{y}    = $h_y;
+    return $zone;
+}
+
+sub getZoneByXY {
+    my ( $x, $y, $level ) = @_;
+    my $scl = $level;
+    my $h_size  =  __setHexSize( $level );
+    my $unit_x  = 6 * $h_size;
+    my $unit_y  = 6 * $h_size * $h_k;
+    my $h_max   = round( $h_base / $unit_x + $h_base / $unit_y );
+    my $h_lat_y = ( $h_k * $x * $unit_x + $y * $unit_y ) / 2;
+    my $h_lon_x = ( $h_lat_y - $y * $unit_y ) / $h_k;
+    my $h_loc   = __xy2loc( $h_lon_x, $h_lat_y );
+    my $x_p = $x < 0 ? 1 : 0;
+    my $y_p = $y < 0 ? 1 : 0;
+
+    my $x_abs   = abs( $x ) * 2 + $x_p;
+    my $y_abs   = abs( $y ) * 2 + $y_p;
+    my $x_10000 = floor( ( $x_abs % 77600000 ) / 1296000 );
+    my $x_1000  = floor( ( $x_abs % 1296000  ) / 216000  );
+    my $x_100   = floor( ( $x_abs % 216000   ) / 3600    );
+    my $x_10    = floor( ( $x_abs % 3600     ) / 60      );
+    my $x_1     = floor( ( $x_abs % 3600     ) % 60      );
+    my $y_10000 = floor( ( $y_abs % 77600000 ) / 1296000 );
+    my $y_1000  = floor( ( $y_abs % 1296000  ) / 216000  );
+    my $y_100   = floor( ( $y_abs % 216000   ) / 3600    );
+    my $y_10    = floor( ( $y_abs % 3600     ) / 60      );
+    my $y_1     = floor( ( $y_abs % 3600     ) % 60      );
+    my $h_code  = $h_key[ $level % 60 ];
+
+    if ( $h_max >= 1296000.0 / 2.0 ) {
+        $h_code = $h_code . $h_key[$x_10000] . $h_key[$y_10000];
+    }
+    if ( $h_max >= 216000.0  / 2.0 ) {
+        $h_code = $h_code . $h_key[$x_1000]  . $h_key[$y_1000];
+    }
+    if ( $h_max >= 3600.0    / 2.0 ) {
+        $h_code = $h_code . $h_key[$x_100]   . $h_key[$y_100];
+    }
+    if ( $h_max >= 60.0      / 2.0 ) {
+        $h_code = $h_code . $h_key[$x_10]    . $h_key[$y_10];
+    }
+
+    $h_code .= $h_key[$x_1] . $h_key[$y_1];
+
+    my $zone     = {};
+
+    $zone->{code} = $h_code;
+    $zone->{lat}  = $h_loc->[1];
+    $zone->{lon}  = $h_loc->[0];
+    $zone->{x}    = $x;
+    $zone->{y}    = $y;
+
     return $zone;
 }
 
