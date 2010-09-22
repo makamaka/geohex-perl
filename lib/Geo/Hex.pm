@@ -239,6 +239,32 @@ sub getZoneByXY {
     return $zone;
 }
 
+
+sub getSteps {
+    my ( $start_zone, $end_zone ) = @_;
+    my $x = $end_zone->{ x } - $start_zone->{ x };
+    my $y = $end_zone->{ y } - $start_zone->{ y };
+    my $xabs = abs( $x );
+    my $yabs = abs( $y );
+
+    my $xqad = $xabs ? $x / $xabs : undef;
+    my $yqad = $yabs ? $y / $yabs : undef;
+
+    my $m = 0;
+
+    if( defined $xqad and defined $yqad and $xqad == $yqad ) {
+        if( $yabs > $xabs ) {
+            $m = $x;
+        }
+        else {
+            $m = $y;
+        }
+    }
+
+    return $xabs + $yabs - abs( $m ) + 1;
+}
+
+
 sub __setHexSize {
   return $h_base / 2.0 ** $_[0] / 3.0;
 }
