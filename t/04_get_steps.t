@@ -7,16 +7,19 @@ use Data::Dumper;
 
 # http://github.com/geohex/geohex-docs/wiki/test-case
 
-my @data = map { chomp $_; [ split/,/,$_ ]  } <DATA>;
+my @data = map { chomp $_; [ split/,/,$_ ]  } grep { length $_ > 1 } <DATA>;
 
 plan tests => scalar( @data );
 
 for my $d ( @data ) {
     my ( $code1, $code2, $steps, $valid ) = @$d;
+
+    next unless defined $code1;
+
     my $start_zone = getZoneByCode( $code1 );
     my $end_zone   = getZoneByCode( $code2 );
 #    print Dumper([ $start_zone, $end_zone ]);
-    is( Geo::Hex::getSteps( $start_zone, $end_zone ), $steps );
+    is( Geo::Hex::getSteps( $start_zone, $end_zone ), $steps, "$code1 - $code2" );
 }
 
 =pod
@@ -38,4 +41,6 @@ bae,baa,2,3
 bae,bad,3,4
 cga,cfe,2,8
 caa,cca,1,2
-caa,ccc,2,2
+caa,ccc,1,2
+eyf,ejy,2,31
+eke,eqc,4,5
