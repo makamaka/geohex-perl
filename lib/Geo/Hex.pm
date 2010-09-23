@@ -56,8 +56,10 @@ sub getZoneByLocation {
     my $h_pos_y  = ( $lat_grid - $h_k * $lon_grid ) / $unit_y;
     my $h_x_0    = floor($h_pos_x);
     my $h_y_0    = floor($h_pos_y);
-    my $h_x_q    = floor(($h_pos_x - $h_x_0) * 100.0) / 100.0;
-    my $h_y_q    = floor(($h_pos_y - $h_y_0) * 100.0) / 100.0;
+#    my $h_x_q    = floor(($h_pos_x - $h_x_0) * 100.0) / 100.0;
+#    my $h_y_q    = floor(($h_pos_y - $h_y_0) * 100.0) / 100.0;
+    my $h_x_q    = $h_pos_x - $h_x_0; # v2.03
+    my $h_y_q    = $h_pos_y - $h_y_0; # v2.03
     my $h_x      = round($h_pos_x);
     my $h_y      = round($h_pos_y);
 
