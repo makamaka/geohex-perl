@@ -316,8 +316,8 @@ Geo::Hex - Convert between latitude/longitude and GeoHex code (version 2:world w
     # $zone->{code} : GeoHex code
     # $zone->{lat}  : Latirude of given GeoHex's center point
     # $zone->{lon}  : Longitude of given GeoHex's center point
-    # $zone->{hx}   : Mercator X coordinate of given GeoHex's center point 
-    # $zone->{hy}   : Mercator Y coordinate of given GeoHex's center point 
+    # $zone->{x}    : Mercator X coordinate of given GeoHex's center point 
+    # $zone->{y}    : Mercator Y coordinate of given GeoHex's center point 
 
 =head1 EXPORT
 
@@ -350,7 +350,6 @@ Exporter
 POSIX
 Math::Round
 Math::Trig
-Geo::Proj4
 
 =head1 AUTHOR
 
