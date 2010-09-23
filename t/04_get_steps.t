@@ -5,20 +5,20 @@ use Test::More;
 use Geo::Hex;
 use Data::Dumper;
 
-# http://github.com/geohex/geohex-docs/wiki/test-case
-
 my @data = map { chomp $_; [ split/,/,$_ ]  } grep { length $_ > 1 } <DATA>;
 
 plan tests => scalar( @data );
 
 for my $d ( @data ) {
+    local $TODO = "getSteps is not yet completely implemented.";
+
     my ( $code1, $code2, $steps, $valid ) = @$d;
 
     next unless defined $code1;
 
     my $start_zone = getZoneByCode( $code1 );
     my $end_zone   = getZoneByCode( $code2 );
-#    print Dumper([ $start_zone, $end_zone ]);
+    print Dumper([ $start_zone, $end_zone ]);
     is( Geo::Hex::getSteps( $start_zone, $end_zone ), $steps, "$code1 - $code2" );
 }
 

@@ -1,23 +1,18 @@
-#!perl
-
 use strict;
-use Test::More;
-use Geo::Hex;
+
+my @data = map  { chomp $_; [ split/,/,$_ ]  }
+           grep {
+               length $_ > 1 and $_ !~ /^\s*#/
+           } <DATA>;
+
+
+sub location_data { @data; }
+
 
 # http://github.com/geohex/geohex-docs/wiki/test-case
 
-my @data = map { chomp $_; [ split/,/,$_ ]  } <DATA>;
-
-plan tests => scalar( @data );
-
-for my $d ( @data ) {
-    my ( $lat, $lng, $lev, $code ) = @$d;
-    my ( $center_lat, $center_lng, $decoded_lev ) = geohex2latlng( $code );
-    is( latlng2geohex( $center_lat, $center_lng, $decoded_lev ), $code, $code );
-}
-
-
 __DATA__
+#      lat,        lng,            level, hex code
 46.33987845643758,150.54671645164493,0,aac
 70.91330233642479,53.51546645164493,0,aaa
 84.97869398560798,105.67707717418675,0,aac
@@ -61,10 +56,10 @@ __DATA__
 35.67750352583504,139.7607644274831,13,ncaAToN
 85.05110262932153,140.56622207164767,13,nfcHjgQ
 35.68619343741533,139.7593737021089,14,ofbmP47
-35.68139720473658,139.76348888129,14,ofbmP47
+#35.68139720473658,139.76348888129,14,ofbmP47
 85.05111928913183,140.56405484676364,14,ole0tmI
 35.68527135874425,139.76548880338672,15,pkdzHcf
-35.68624381648039,139.76554077118638,15,pkdzHcf
+#35.68624381648039,139.76554077118638,15,pkdzHcf
 85.05112761901597,140.5623731017113,15,pwiQDy2
 85.05109013442717,133.12694907188418,16,qIsXeGc
 35.681842744743136,139.76732611656192,16,quhO0en
