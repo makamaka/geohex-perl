@@ -1,17 +1,17 @@
 package Geo::Hex1;
 
+use 5.006;
 use warnings;
 use strict;
 use Carp;
+use Exporter;
 
 use POSIX       qw/floor ceil/;
 use Math::Round qw/round/;
 
-use version; our $VERSION = qv('0.0.2');
-use vars qw(@ISA @EXPORT);
-use Exporter;
-@ISA    = qw(Exporter);
-@EXPORT = qw(latlng2geohex geohex2latlng geohex2polygon geohex2distance distance2geohexes);
+our $VERSION = '0.03';
+our @ISA     = qw(Exporter);
+our @EXPORT  = qw(latlng2geohex geohex2latlng geohex2polygon geohex2distance distance2geohexes);
 
 # Constants
 
