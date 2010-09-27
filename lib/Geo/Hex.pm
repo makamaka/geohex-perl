@@ -101,21 +101,21 @@ sub getZoneByLocation {
     my $h_x_abs = abs( $h_x ) * 2.0 + $h_x_p;
     my $h_y_abs = abs( $h_y ) * 2.0 + $h_y_p;
 
-    my $h_x_10000 = floor( ( $h_x_abs % 77600000 ) / 1296000.0 );
-    my $h_x_1000  = floor( ( $h_x_abs % 1296000  ) / 216000.0 );
+    my $h_x_10000 = floor( ( $h_x_abs % 77600000 ) / 12960000.0 );
+    my $h_x_1000  = floor( ( $h_x_abs % 12960000  ) / 216000.0 );
     my $h_x_100   = floor( ( $h_x_abs % 216000   ) / 3600.0 );
     my $h_x_10    = floor( ( $h_x_abs % 3600     ) / 60.0 );
     my $h_x_1     = floor( ( $h_x_abs % 3600     ) % 60 );
 
-    my $h_y_10000 = floor( ( $h_y_abs % 77600000) / 1296000.0 );
-    my $h_y_1000  = floor( ( $h_y_abs % 1296000 ) / 216000.0 );
+    my $h_y_10000 = floor( ( $h_y_abs % 77600000) / 12960000.0 );
+    my $h_y_1000  = floor( ( $h_y_abs % 12960000 ) / 216000.0 );
     my $h_y_100   = floor( ( $h_y_abs % 216000  ) / 3600.0 );
     my $h_y_10    = floor( ( $h_y_abs % 3600    ) / 60.0 );
     my $h_y_1     = floor( ( $h_y_abs % 3600    ) % 60 );
 
     my $h_code    = $h_key[$_level % 60];
 
-    if ( $h_max >= 1296000.0 / 2.0 ) {
+    if ( $h_max >= 12960000.0 / 2.0 ) {
         $h_code = $h_code . $h_key[$h_x_10000] . $h_key[$h_y_10000];
     }
     if ( $h_max >= 216000.0  / 2.0 ) {
@@ -151,10 +151,10 @@ sub getZoneByCode {
     my $h_x=0;
     my $h_y=0;
 
-    if( $h_max >= 1296000.0 / 2.0 ) {
-        $h_x = index($h_key, $_code[1]) * 1296000.0 + index($h_key, $_code[3]) * 216000.0 + 
+    if( $h_max >= 12960000.0 / 2.0 ) {
+        $h_x = index($h_key, $_code[1]) * 12960000  + index($h_key, $_code[3]) * 216000.0 + 
                index($h_key, $_code[5]) * 3600.0    + index($h_key, $_code[7]) * 60.0     + index($h_key, $_code[9]);
-        $h_y = index($h_key, $_code[2]) * 1296000.0 + index($h_key, $_code[4]) * 216000.0 + 
+        $h_y = index($h_key, $_code[2]) * 12960000  + index($h_key, $_code[4]) * 216000.0 + 
                index($h_key, $_code[6]) * 3600.0    + index($h_key, $_code[8]) * 60.0     + index($h_key, $_code[10]);
     } elsif ( $h_max >= 216000.0 / 2.0 ) {
         $h_x = index($h_key, $_code[1]) * 216000.0  + index($h_key, $_code[3]) * 3600.0   +
@@ -203,19 +203,19 @@ sub getZoneByXY {
 
     my $x_abs   = abs( $x ) * 2 + $x_p;
     my $y_abs   = abs( $y ) * 2 + $y_p;
-    my $x_10000 = floor( ( $x_abs % 77600000 ) / 1296000 );
-    my $x_1000  = floor( ( $x_abs % 1296000  ) / 216000  );
+    my $x_10000 = floor( ( $x_abs % 77600000 ) / 12960000 );
+    my $x_1000  = floor( ( $x_abs % 12960000 ) / 216000  );
     my $x_100   = floor( ( $x_abs % 216000   ) / 3600    );
     my $x_10    = floor( ( $x_abs % 3600     ) / 60      );
     my $x_1     = floor( ( $x_abs % 3600     ) % 60      );
-    my $y_10000 = floor( ( $y_abs % 77600000 ) / 1296000 );
-    my $y_1000  = floor( ( $y_abs % 1296000  ) / 216000  );
+    my $y_10000 = floor( ( $y_abs % 77600000 ) / 12960000 );
+    my $y_1000  = floor( ( $y_abs % 12960000 ) / 216000  );
     my $y_100   = floor( ( $y_abs % 216000   ) / 3600    );
     my $y_10    = floor( ( $y_abs % 3600     ) / 60      );
     my $y_1     = floor( ( $y_abs % 3600     ) % 60      );
     my $h_code  = $h_key[ $level % 60 ];
 
-    if ( $h_max >= 1296000.0 / 2.0 ) {
+    if ( $h_max >= 12960000 / 2.0 ) {
         $h_code = $h_code . $h_key[$x_10000] . $h_key[$y_10000];
     }
     if ( $h_max >= 216000.0  / 2.0 ) {
