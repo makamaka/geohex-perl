@@ -1,12 +1,14 @@
 package Geo::Hex;
 
+# code from http://geohex.net/hex_v2.03_core.js
+
 use warnings;
 use strict;
 use Carp;
 
-use POSIX       qw/floor ceil/;
-use Math::Round qw/round/;
-use Math::Trig qw( tan atan );
+use POSIX       qw( floor ceil );
+use Math::Round qw( round );
+use Math::Trig  qw( tan atan );
 
 our $VERSION = '0.02_01';
 use vars qw(@ISA @EXPORT);
@@ -14,106 +16,115 @@ use Exporter;
 @ISA    = qw(Exporter);
 @EXPORT = qw(latlng2geohex geohex2latlng getZoneByLocation getZoneByCode);
 
-# code from http://geohex.net/hex_v2.03_core.js
 
 # Constants
 
-use constant PI => Math::Trig::pi();
+use constant PI     => Math::Trig::pi();
+use constant H_DEG  => PI * 30.0 / 180.0;
+use constant H_K    => tan( H_DEG );
+use constant H_BASE => 20037508.34;
 
-my $h_key       = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-my @h_key       = split( //, $h_key );
-my $h_base      = 20037508.34;
-my $h_deg       = PI * ( 30.0 / 180.0 );
-my $h_k         = tan($h_deg);
-my $h_range     = 21;
+my @h_key;
+my %h_key;
 
+BEGIN {
+    my $i = 0;
+    @h_key = split( //, 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ' );
+    $h_key{ $_ } = $i++ for @h_key;
+}
+
+#
+# APIs
+#
 
 sub latlng2geohex {
     return getZoneByLocation(@_)->{code};
 }
 
-sub geohex2latlng{
-    my $_code    = shift;
-    my $level    = index($h_key, substr($_code,0,1));
-    my $zone     = getZoneByCode($_code);
-    return ( ( map { $zone->{$_} } qw/lat lon/ ), $level);
+
+sub geohex2latlng {
+    my $code = $_[0];
+    my $zone = getZoneByCode( $code );
+    return ( @{ $zone }{qw/lat lon/}, $h_key{ substr( $code, 0, 1 ) } );
 }
 
-sub getZoneByLocation {
-    my ( $_lat, $_lon, $_level ) = @_;
-    $_level = 16 if ( !defined($_level) );
-    my $hex_pos;
-    my $h_size = __setHexSize($_level);
-    my $zone   = {};
 
-    my $z_xy   = __loc2xy($_lon, $_lat);
+sub getZoneByLocation {
+    my ( $lat, $lon, $level ) = @_;
+
+    $level = 16 unless defined $level;
+
+    my $hex_pos;
+
+    my $h_size = _hex_size( $level );
+    my $z_xy   = _loc2xy( $lon, $lat );
 
     my $lon_grid = $z_xy->[0];
     my $lat_grid = $z_xy->[1];
     my $unit_x   = 6.0 * $h_size;
-    my $unit_y   = 6.0 * $h_size * $h_k;
-    my $h_pos_x  = ( $lon_grid + $lat_grid / $h_k ) / $unit_x;
-    my $h_pos_y  = ( $lat_grid - $h_k * $lon_grid ) / $unit_y;
-    my $h_x_0    = floor($h_pos_x);
-    my $h_y_0    = floor($h_pos_y);
-#    my $h_x_q    = floor(($h_pos_x - $h_x_0) * 100.0) / 100.0;
-#    my $h_y_q    = floor(($h_pos_y - $h_y_0) * 100.0) / 100.0;
+    my $unit_y   = 6.0 * $h_size * H_K;
+    my $h_pos_x  = ( $lon_grid + $lat_grid / H_K ) / $unit_x;
+    my $h_pos_y  = ( $lat_grid - H_K * $lon_grid ) / $unit_y;
+    my $h_x_0    = floor( $h_pos_x );
+    my $h_y_0    = floor( $h_pos_y );
     my $h_x_q    = $h_pos_x - $h_x_0; # v2.03
     my $h_y_q    = $h_pos_y - $h_y_0; # v2.03
-    my $h_x      = round($h_pos_x);
-    my $h_y      = round($h_pos_y);
+    my $h_x      = round( $h_pos_x );
+    my $h_y      = round( $h_pos_y );
 
-    my $h_max    = round( $h_base / $unit_x + $h_base / $unit_y );
+    my $h_max    = round( H_BASE / $unit_x + H_BASE / $unit_y );
 
     if ( $h_y_q > - $h_x_q + 1.0 ) {
         if ( ( $h_y_q < 2.0 * $h_x_q ) && ( $h_y_q > 0.5 * $h_x_q ) ) {
             $h_x = $h_x_0 + 1.0;
             $h_y = $h_y_0 + 1.0;
         }
-    } elsif ( $h_y_q < - $h_x_q + 1.0 ){
+    }
+    elsif ( $h_y_q < - $h_x_q + 1.0 ){
         if ( ( $h_y_q > ( 2.0 * $h_x_q ) - 1.0 ) && ( $h_y_q < ( 0.5 * $h_x_q) + 0.5 ) ) {
             $h_x = $h_x_0;
             $h_y = $h_y_0;
         }
     }
 
-    my $h_lat = ( $h_k * $h_x * $unit_x + $h_y * $unit_y ) / 2.0;
-    my $h_lon = ( $h_lat - $h_y * $unit_y ) / $h_k;
+    my $h_lat = ( H_K * $h_x * $unit_x + $h_y * $unit_y ) / 2.0;
+    my $h_lon = ( $h_lat - $h_y * $unit_y ) / H_K;
 
-    my $z_loc   = __xy2loc($h_lon, $h_lat);
+    my $z_loc   = _xy2loc( $h_lon, $h_lat );
     my $z_loc_x = $z_loc->[0];
     my $z_loc_y = $z_loc->[1];
-    if ( $h_base - $h_lon < $h_size ) {
+
+    if ( H_BASE - $h_lon < $h_size ) {
+       ( $h_x, $h_y ) = ( $h_y, $h_x );
        $z_loc_x = 180.0;
-       my $h_xy = $h_x;
-       $h_x     = $h_y;
-       $h_y     = $h_xy;
     }
 
     my $h_x_p =0;
     my $h_y_p =0;
+
     if ( $h_x < 0.0 ) {
         $h_x_p = 1.0;
     }
     if ( $h_y < 0.0 ) {
         $h_y_p = 1.0;
     }
+
     my $h_x_abs = abs( $h_x ) * 2.0 + $h_x_p;
     my $h_y_abs = abs( $h_y ) * 2.0 + $h_y_p;
 
     my $h_x_10000 = floor( ( $h_x_abs % 77600000 ) / 12960000.0 );
-    my $h_x_1000  = floor( ( $h_x_abs % 12960000  ) / 216000.0 );
+    my $h_x_1000  = floor( ( $h_x_abs % 12960000 ) / 216000.0 );
     my $h_x_100   = floor( ( $h_x_abs % 216000   ) / 3600.0 );
     my $h_x_10    = floor( ( $h_x_abs % 3600     ) / 60.0 );
     my $h_x_1     = floor( ( $h_x_abs % 3600     ) % 60 );
 
-    my $h_y_10000 = floor( ( $h_y_abs % 77600000) / 12960000.0 );
+    my $h_y_10000 = floor( ( $h_y_abs % 77600000 ) / 12960000.0 );
     my $h_y_1000  = floor( ( $h_y_abs % 12960000 ) / 216000.0 );
-    my $h_y_100   = floor( ( $h_y_abs % 216000  ) / 3600.0 );
-    my $h_y_10    = floor( ( $h_y_abs % 3600    ) / 60.0 );
-    my $h_y_1     = floor( ( $h_y_abs % 3600    ) % 60 );
+    my $h_y_100   = floor( ( $h_y_abs % 216000   ) / 3600.0 );
+    my $h_y_10    = floor( ( $h_y_abs % 3600     ) / 60.0 );
+    my $h_y_1     = floor( ( $h_y_abs % 3600     ) % 60 );
 
-    my $h_code    = $h_key[$_level % 60];
+    my $h_code    = $h_key[ $level % 60 ];
 
     if ( $h_max >= 12960000.0 / 2.0 ) {
         $h_code = $h_code . $h_key[$h_x_10000] . $h_key[$h_y_10000];
@@ -129,75 +140,79 @@ sub getZoneByLocation {
     }
     $h_code = $h_code . $h_key[$h_x_1] . $h_key[$h_y_1];
 
-    $zone->{lat}  = $z_loc_y;
-    $zone->{lon}  = $z_loc_x;
-    $zone->{x}    = $h_x;
-    $zone->{y}    = $h_y;
-    $zone->{code} = $h_code;
-    return $zone;
+    return {
+        code => $h_code,
+        lat  => $z_loc_y,
+        lon  => $z_loc_x,
+        x    => $h_x,
+        y    => $h_y,
+    };
 }
+
 
 sub getZoneByCode {
-    my $_code    = shift;
-    my @_code    = split(//,$_code);
-    my $c_length = @_code;
-    my $zone     = {};
-    my $level    = index($h_key, $_code[0]);
-    my $scl      = $level;
-    my $h_size   = __setHexSize( $level );
-    my $unit_x   = 6.0 * $h_size;
-    my $unit_y   = 6.0 * $h_size * $h_k;
-    my $h_max    = round($h_base / $unit_x + $h_base / $unit_y);
-    my $h_x=0;
-    my $h_y=0;
+    my $code    = shift;
+    my @code    = split( //, $code );
+    my $h_size  = _hex_size( $h_key{ $code[0] } );
+    my $unit_x  = 6.0 * $h_size;
+    my $unit_y  = 6.0 * $h_size * H_K;
+    my $h_max   = round( H_BASE / $unit_x + H_BASE / $unit_y );
+    my $h_x = 0;
+    my $h_y = 0;
 
     if( $h_max >= 12960000.0 / 2.0 ) {
-        $h_x = index($h_key, $_code[1]) * 12960000  + index($h_key, $_code[3]) * 216000.0 + 
-               index($h_key, $_code[5]) * 3600.0    + index($h_key, $_code[7]) * 60.0     + index($h_key, $_code[9]);
-        $h_y = index($h_key, $_code[2]) * 12960000  + index($h_key, $_code[4]) * 216000.0 + 
-               index($h_key, $_code[6]) * 3600.0    + index($h_key, $_code[8]) * 60.0     + index($h_key, $_code[10]);
-    } elsif ( $h_max >= 216000.0 / 2.0 ) {
-        $h_x = index($h_key, $_code[1]) * 216000.0  + index($h_key, $_code[3]) * 3600.0   +
-               index($h_key, $_code[5]) * 60.0      + index($h_key, $_code[7]);
-        $h_y = index($h_key, $_code[2]) * 216000.0  + index($h_key, $_code[4]) * 3600.0   +
-               index($h_key, $_code[6]) * 60.0      + index($h_key, $_code[8]);
-    } elsif ( $h_max >= 3600.0 / 2.0 ) {
-        $h_x = index($h_key, $_code[1]) * 3600.0    + index($h_key, $_code[3]) * 60.0     + index($h_key, $_code[5]);
-        $h_y = index($h_key, $_code[2]) * 3600.0    + index($h_key, $_code[4]) * 60.0     + index($h_key, $_code[6]);
-    } elsif ( $h_max >= 60.0 / 2.0 ) {
-        $h_x = index($h_key, $_code[1]) * 60.0      + index($h_key, $_code[3]);
-        $h_y = index($h_key, $_code[2]) * 60.0      + index($h_key, $_code[4]);
-    } else {
-        $h_x = index($h_key, $_code[1]);
-        $h_y = index($h_key, $_code[2]);
+        $h_x = $h_key{ $code[1] } * 12960000  + $h_key{ $code[3] } * 216000.0 + 
+               $h_key{ $code[5] } * 3600.0    + $h_key{ $code[7] } * 60.0     + $h_key{ $code[9] };
+        $h_y = $h_key{ $code[2] } * 12960000  + $h_key{ $code[4] } * 216000.0 + 
+               $h_key{ $code[6] } * 3600.0    + $h_key{ $code[8] } * 60.0     + $h_key{ $code[10] };
+    }
+    elsif ( $h_max >= 216000.0 / 2.0 ) {
+        $h_x = $h_key{ $code[1] } * 216000.0  + $h_key{ $code[3] } * 3600.0   +
+               $h_key{ $code[5] } * 60.0      + $h_key{ $code[7] };
+        $h_y = $h_key{ $code[2] } * 216000.0  + $h_key{ $code[4] } * 3600.0   +
+               $h_key{ $code[6] } * 60.0      + $h_key{ $code[8] };
+    }
+    elsif ( $h_max >= 3600.0 / 2.0 ) {
+        $h_x = $h_key{ $code[1] } * 3600.0    + $h_key{ $code[3] } * 60.0     + $h_key{ $code[5] };
+        $h_y = $h_key{ $code[2] } * 3600.0    + $h_key{ $code[4] } * 60.0     + $h_key{ $code[6] };
+    }
+    elsif ( $h_max >= 60.0 / 2.0 ) {
+        $h_x = $h_key{ $code[1] } * 60.0      + $h_key{ $code[3] };
+        $h_y = $h_key{ $code[2] } * 60.0      + $h_key{ $code[4] };
+    }
+    else {
+        $h_x = $h_key{ $code[1] };
+        $h_y = $h_key{ $code[2] };
     }
 
-    $h_x        = ( $h_x % 2 ) ? -($h_x - 1.0) / 2.0 : $h_x / 2.0;
-    $h_y        = ( $h_y % 2 ) ? -($h_y - 1.0) / 2.0 : $h_y / 2.0;
-    my $h_lat_y = ( $h_k * $h_x * $unit_x + $h_y * $unit_y ) / 2.0;
-    my $h_lon_x = ( $h_lat_y - $h_y * $unit_y ) / $h_k;
+    $h_x = ( $h_x % 2 ) ? ( 1.0 - $h_x ) / 2.0 : $h_x / 2.0;
+    $h_y = ( $h_y % 2 ) ? ( 1.0 - $h_y ) / 2.0 : $h_y / 2.0;
 
-    my $h_ll    = __xy2loc($h_lon_x, $h_lat_y);
-    my $h_lon   = $h_ll->[0];
-    my $h_lat   = $h_ll->[1];
-    $zone->{code} = $_code;
-    $zone->{lat}  = $h_lat;
-    $zone->{lon}  = $h_lon;
-    $zone->{x}    = $h_x;
-    $zone->{y}    = $h_y;
-    return $zone;
+    my $h_lat_y = ( H_K * $h_x * $unit_x + $h_y * $unit_y ) / 2.0;
+    my $h_lon_x = ( $h_lat_y - $h_y * $unit_y ) / H_K;
+
+    my ( $h_lon, $h_lat ) = @{ _xy2loc( $h_lon_x, $h_lat_y ) }[0,1];
+
+    return {
+        code => $code,
+        lat  => $h_lat,
+        lon  => $h_lon,
+        x    => $h_x,
+        y    => $h_y,
+    };
 }
+
 
 sub getZoneByXY {
     my ( $x, $y, $level ) = @_;
     my $scl = $level;
-    my $h_size  =  __setHexSize( $level );
+    my $h_size  =  _hex_size( $level );
     my $unit_x  = 6 * $h_size;
-    my $unit_y  = 6 * $h_size * $h_k;
-    my $h_max   = round( $h_base / $unit_x + $h_base / $unit_y );
-    my $h_lat_y = ( $h_k * $x * $unit_x + $y * $unit_y ) / 2;
-    my $h_lon_x = ( $h_lat_y - $y * $unit_y ) / $h_k;
-    my $h_loc   = __xy2loc( $h_lon_x, $h_lat_y );
+    my $unit_y  = 6 * $h_size * H_K;
+    my $h_max   = round( H_BASE / $unit_x + H_BASE / $unit_y );
+    my $h_lat_y = ( H_K * $x * $unit_x + $y * $unit_y ) / 2;
+    my $h_lon_x = ( $h_lat_y - $y * $unit_y ) / H_K;
+    my $h_loc   = _xy2loc( $h_lon_x, $h_lat_y );
     my $x_p = $x < 0 ? 1 : 0;
     my $y_p = $y < 0 ? 1 : 0;
 
@@ -267,26 +282,33 @@ sub getSteps {
 }
 
 
-sub __setHexSize {
-  return $h_base / 2.0 ** $_[0] / 3.0;
+#
+# Internals
+#
+
+sub _hex_size {
+  return H_BASE / 2.0 ** $_[0] / 3.0;
 }
 
-sub __loc2xy {
+
+sub _loc2xy {
     my ( $lon, $lat ) = @_;
-    my $x = $lon * $h_base / 180;
-    my $y = $h_base * log( tan( ( 90 + $lat ) * PI / 360) ) / ( PI / 180 ) / 180;
+    my $x = $lon * H_BASE / 180;
+    my $y = H_BASE * log( tan( ( 90 + $lat ) * PI / 360) ) / ( PI / 180 ) / 180;
     return [ $x, $y ];
 }
 
-sub __xy2loc {
+
+sub _xy2loc {
     my ( $x, $y ) = @_;
-    my $lon = ( $x / $h_base ) * 180;
-    my $lat = ( $y / $h_base ) * 180;
+    my $lon = ( $x / H_BASE ) * 180;
+    my $lat = ( $y / H_BASE ) * 180;
     $lat = 180 / PI * ( 2 * atan( exp( $lat * PI / 180 ) ) - PI / 2 );
     return [ $lon, $lat ];
 }
 
-1; # Magic true value required at end of module
+
+1;
 __END__
 
 =head1 NAME
