@@ -1,16 +1,12 @@
 Geo::Hex - GeoHex decoder/encoder
 
 INSTALLATION
-
-To install this module, run the following commands:
+  To install this module, run the following commands:
 
     perl Makefile.PL
     make
     make test
     make install
-
-NAME
-    Geo::Hex - GeoHex decoder/encoder
 
 SYNOPSIS
         use Geo::Hex;
@@ -30,6 +26,9 @@ SYNOPSIS
         # $zone->x     : Mercator X coordinate of given GeoHex's center point 
         # $zone->y     : Mercator Y coordinate of given GeoHex's center point 
     
+        $geohex->spec_version; # => 3
+    
+    
         # Export function - GeoHex v3 by default
         $zone = decode_geohex( 'XM4885487' );
         $code = encode_geohex( $zone );
@@ -44,23 +43,48 @@ SYNOPSIS
         my ( $center_lat, $center_lng, $level ) = geohex2latlng( $code );
     
     
-        # Explicit export function - Javascript original method
+        # Explicit export function - original javascript name
         use Geo::Hex v => 3, qw(getZoneByLocation getZoneByCode);
         # From latitude/longitude to zone object*
         $zone = getZoneByLocation( $lat, $lng, $level );
         # From hex code to zone object*
         $zone = getZoneByCode( $code );
 
-EXPORT
-    "latlng2geohex( $lat, $lng, $level )"
-        Convert latitude/longitude to GeoHex code. $level is optional, and
-        default value is 16.
+CLASS METHODS
+  new
+    Creates a new Geo::Hex::Coder object.
 
-    "geohex2latlng( $hex )"
-        Convert GeoHex code to center latitude/longitude, and level value.
+    version
+        The GeoHex specification vresion.
+
+    v   The synonym to "version" option.
+
+  spec_version
+INSTANCE METHODS
+  decode
+  encode
+  spec_version
+DEFAULT FUNCTIONS
+  decode_geohex
+  encode_geohex
+EXPORT FUNCTIONS
+  latlng2geohex
+        latlng2geohex( $lat, $lng, $level );
+    
+        latlng2geohex( $zone );
+
+    Convert latitude/longitude to GeoHex code. $level is optional, and
+    default value is 16.
+
+  geohex2latlng
+        geohex2latlng( $code );
+
+    Convert GeoHex code to center latitude/longitude, and level value.
 
 SEE ALSO
     <http://geogames.net/geohex/v3>
+
+    Geo::Hex::Zone, Geo::Hex1, Geo::Hex2, Geo::Hex3
 
 AUTHOR
     Makamaka Hannyaharamitu
