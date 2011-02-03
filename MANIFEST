@@ -21,4 +21,12 @@ t/203_latlng2geohex.t
 t/204_geohex2latlng.t
 t/205_get_zone_by_xy.t
 t/206_get_steps.t
+t/300_load_v3.t
+t/301_get_zone_by_loc.t
+t/302_get_zone_by_code.t
+t/310_encode.t
+t/311_decode.t
+t/312_to_zone.t
+t/decode_data.pl
+t/encode_data.pl
 t/location_data.pl
