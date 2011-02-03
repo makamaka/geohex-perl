@@ -49,11 +49,42 @@ sub spec_version {
     $_[0]->{v};
 }
 
+sub encode {}
+
+sub decode {}
 
 package
     Geo::Hex3::Coder;
 
 our @ISA = qw(Geo::Hex::Coder);
+
+require Geo::Hex3;
+
+sub encode {
+    my ( $self, @args ) = @_;
+    @args == 3
+        or Carp::croak('encode() must take 3 args(lat, lon, level).');
+    my $zone = Geo::Hex3::getZoneByLocation(@args);
+    return $zone->{ code };
+}
+
+sub decode {
+    my ( $self, $code ) = @_;
+    my $zone = Geo::Hex3::getZoneByCode( $code );
+    return wantarray ? (@{$zone}{qw/lat lon/}, length($code) - 2) : [@{$zone}{qw/lat lon/}, length($code) - 2];
+}
+
+
+sub to_zone {
+    my ( $self, @args ) = @_;
+    my $zone = @args == 1 ? Geo::Hex3::getZoneByCode( $args[0] )
+             : @args == 3 ? Geo::Hex3::getZoneByLocation(@args)
+             : Carp::croak('encode() must take 3 args(lat, lon, level) or 1 args(Geo::Hex::Zone).');
+
+    $zone->{ level } = length($zone->{ code }) - 2;
+
+    return $zone;
+}
 
 
 package
@@ -82,9 +113,12 @@ Geo::Hex - GeoHex decoder/encoder
     # OO-style
     my $geohex = Geo::Hex->new( version => 3 ); # v3 by default
     
-    my $zone = $geohex->decode( 'XM4885487' );
-    my $code = $geohex->encode( $zone ); # = $geohex->encode( $zone->lat, $zone->lon, $zone->level )
-                                         # => XM4885487
+    my ($lat, $lon, $level) = $geohex->decode( 'XM4885487' );
+    my $code                = $geohex->encode( $lat, $lon, $level );
+    # => XM4885487
+    
+    my $zone = $geohex->to_zone( 'XM4885487' );
+       $zone = $geohex->to_zone( $lat, $lon, $level );
     
     # * zone object: hash value
     # $zone->code  : GeoHex code
@@ -98,8 +132,8 @@ Geo::Hex - GeoHex decoder/encoder
     
     
     # Export function - GeoHex v3 by default
-    $zone = decode_geohex( 'XM4885487' );
-    $code = encode_geohex( $zone );
+    ($lat, $lon, $level) = decode_geohex( $code );
+    $code = encode_geohex( $lat, $lon, $level );
     
     
     # Explicit export function
@@ -122,7 +156,9 @@ Geo::Hex - GeoHex decoder/encoder
 
 =head2 new
 
-Creates a new Geo::Hex::Coder object.
+    $geohex = Geo::Hex->new( %option );
+
+Creates a new Geo::Hex::Coder object. It can take options:
 
 =over 4
 
@@ -138,24 +174,40 @@ The synonym to C<version> option.
 
 =head2 spec_version
 
+Returns specification version.
+
 
 =head1 INSTANCE METHODS
 
 =head2 decode
 
+    ( $lat, $lon, $level ) = $geohex->decode( $code );
+
 =head2 encode
+
+    $code = $geohex->encode( $lat, $lon, $level );
+
+=head2 to_zone
+
+    $zone = $geohex->to_zone( $code );
+    
+    $zone = $geohex->to_zone( $lat, $lon, $level );
 
 =head2 spec_version
 
 
-=head1 DEFAULT FUNCTIONS
+=head1 EXPORT FUNCTIONS
 
 =head2 decode_geohex
 
+    ($lat, $lon, $level) = decode_geohex( $code );
+
 =head2 encode_geohex
 
+    $code = encode_geohex( $lat, $lon, $level );
 
-=head1 EXPORT FUNCTIONS
+
+=head1 FUNCTIONS
 
 =head2 latlng2geohex
 
@@ -164,7 +216,6 @@ The synonym to C<version> option.
     latlng2geohex( $zone );
 
 Convert latitude/longitude to GeoHex code.
-$level is optional, and default value is 16.
 
 =head2 geohex2latlng
 
