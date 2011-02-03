@@ -1,4 +1,5 @@
-Geo::Hex - GeoHex decoder/encoder
+NAME
+    Geo::Hex - GeoHex decoder/encoder
 
 INSTALLATION
   To install this module, run the following commands:
@@ -14,9 +15,12 @@ SYNOPSIS
         # OO-style
         my $geohex = Geo::Hex->new( version => 3 ); # v3 by default
     
-        my $zone = $geohex->decode( 'XM4885487' );
-        my $code = $geohex->encode( $zone ); # = $geohex->encode( $zone->lat, $zone->lon, $zone->level )
-                                             # => XM4885487
+        my ($lat, $lon, $level) = $geohex->decode( 'XM4885487' );
+        my $code                = $geohex->encode( $lat, $lon, $level );
+        # => XM4885487
+    
+        my $zone = $geohex->to_zone( 'XM4885487' );
+           $zone = $geohex->to_zone( $lat, $lon, $level );
     
         # * zone object: hash value
         # $zone->code  : GeoHex code
@@ -30,8 +34,8 @@ SYNOPSIS
     
     
         # Export function - GeoHex v3 by default
-        $zone = decode_geohex( 'XM4885487' );
-        $code = encode_geohex( $zone );
+        ($lat, $lon, $level) = decode_geohex( $code );
+        $code = encode_geohex( $lat, $lon, $level );
     
     
         # Explicit export function
@@ -52,7 +56,9 @@ SYNOPSIS
 
 CLASS METHODS
   new
-    Creates a new Geo::Hex::Coder object.
+        $geohex = Geo::Hex->new( %option );
+
+    Creates a new Geo::Hex::Coder object. It can take options:
 
     version
         The GeoHex specification vresion.
@@ -60,21 +66,35 @@ CLASS METHODS
     v   The synonym to "version" option.
 
   spec_version
+    Returns specification version.
+
 INSTANCE METHODS
   decode
+        ( $lat, $lon, $level ) = $geohex->decode( $code );
+
   encode
+        $code = $geohex->encode( $lat, $lon, $level );
+
+  to_zone
+        $zone = $geohex->to_zone( $code );
+    
+        $zone = $geohex->to_zone( $lat, $lon, $level );
+
   spec_version
-DEFAULT FUNCTIONS
-  decode_geohex
-  encode_geohex
 EXPORT FUNCTIONS
+  decode_geohex
+        ($lat, $lon, $level) = decode_geohex( $code );
+
+  encode_geohex
+        $code = encode_geohex( $lat, $lon, $level );
+
+FUNCTIONS
   latlng2geohex
         latlng2geohex( $lat, $lng, $level );
     
         latlng2geohex( $zone );
 
-    Convert latitude/longitude to GeoHex code. $level is optional, and
-    default value is 16.
+    Convert latitude/longitude to GeoHex code.
 
   geohex2latlng
         geohex2latlng( $code );
