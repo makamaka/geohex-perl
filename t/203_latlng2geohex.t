@@ -2,7 +2,7 @@
 
 use strict;
 use Test::More;
-use Geo::Hex;
+use Geo::Hex2;
 
 require 't/location_data.pl';
 

@@ -2,7 +2,7 @@
 
 use strict;
 use Test::More;
-use Geo::Hex;
+use Geo::Hex2;
 use Data::Dumper;
 
 my @data = map { chomp $_; [ split/,/,$_ ]  } grep { length $_ > 1 } <DATA>;
@@ -19,7 +19,7 @@ for my $d ( @data ) {
     my $start_zone = getZoneByCode( $code1 );
     my $end_zone   = getZoneByCode( $code2 );
     print Dumper([ $start_zone, $end_zone ]);
-    is( Geo::Hex::getSteps( $start_zone, $end_zone ), $steps, "$code1 - $code2" );
+    is( Geo::Hex2::getSteps( $start_zone, $end_zone ), $steps, "$code1 - $code2" );
 }
 
 =pod
