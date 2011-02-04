@@ -103,7 +103,6 @@ sub encode {
 sub decode {
     my ( $self, $code ) = @_;
     my $zone  = Geo::Hex2::getZoneByCode( $code );
-    my $level = Geo::Hex2::code_to_level( $code );
     return wantarray ? Geo::Hex2::geohex2latlng( $code ) : [ Geo::Hex2::geohex2latlng( $code ) ];
 }
 
