@@ -4,7 +4,8 @@ package Geo::Hex2;
 
 use warnings;
 use strict;
-use Carp;
+use Carp ();
+use Geo::Hex::Zone;
 
 use POSIX       qw( floor ceil );
 use Math::Round qw( round );
@@ -140,13 +141,14 @@ sub getZoneByLocation {
     }
     $h_code = $h_code . $h_key[$h_x_1] . $h_key[$h_y_1];
 
-    return {
-        code => $h_code,
-        lat  => $z_loc_y,
-        lon  => $z_loc_x,
-        x    => $h_x,
-        y    => $h_y,
-    };
+    return Geo::Hex::Zone->new({
+        code  => $h_code,
+        lat   => $z_loc_y,
+        lon   => $z_loc_x,
+        x     => $h_x,
+        y     => $h_y,
+        level => $level,
+    });
 }
 
 
@@ -193,13 +195,14 @@ sub getZoneByCode {
 
     my ( $h_lon, $h_lat ) = @{ _xy2loc( $h_lon_x, $h_lat_y ) }[0,1];
 
-    return {
-        code => $code,
-        lat  => $h_lat,
-        lon  => $h_lon,
-        x    => $h_x,
-        y    => $h_y,
-    };
+    return Geo::Hex::Zone->new({
+        code  => $code,
+        lat   => $h_lat,
+        lon   => $h_lon,
+        x     => $h_x,
+        y     => $h_y,
+        level => $h_key{ substr( $code, 0, 1 ) },
+    });
 }
 
 

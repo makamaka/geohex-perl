@@ -107,6 +107,14 @@ sub decode {
     return wantarray ? Geo::Hex2::geohex2latlng( $code ) : [ Geo::Hex2::geohex2latlng( $code ) ];
 }
 
+sub to_zone {
+    my ( $self, @args ) = @_;
+    my $zone = @args == 1 ? Geo::Hex2::getZoneByCode( $args[0] )
+             : @args == 3 ? Geo::Hex2::getZoneByLocation(@args)
+             : Carp::croak('encode() must take 3 args(lat, lon, level) or 1 args(Geo::Hex::Zone).');
+    return $zone;
+}
+
 
 package
     Geo::Hex1::Coder;
