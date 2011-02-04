@@ -189,9 +189,17 @@ sub getZoneByCode {
 
     my $h_loc = __xy2loc( $h_lon_x, $h_lat_y );
 
+    # a bad hack for a difference between internal NV and IV.
+    if ( $h_loc->{lon} > 180 or $h_loc->{lon} eq '180' ) {
+        my $c = 3 ** $level;
+        $h_x -= $c;
+        $h_y += $c;
+    }
+
     if ( $h_loc->{lon} > 180 ) {
         $h_loc->{lon} -= 360;
-    } elsif ( $h_loc->{lon} < -180 ) {
+    }
+    elsif ( $h_loc->{lon} < -180 ) {
         $h_loc->{lon} += 360;
     }
 
