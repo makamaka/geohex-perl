@@ -74,7 +74,6 @@ sub decode {
     return wantarray ? (@{$zone}{qw/lat lon/}, length($code) - 2) : [@{$zone}{qw/lat lon/}, length($code) - 2];
 }
 
-
 sub to_zone {
     my ( $self, @args ) = @_;
     my $zone = @args == 1 ? Geo::Hex3::getZoneByCode( $args[0] )
@@ -91,6 +90,22 @@ package
     Geo::Hex2::Coder;
 
 our @ISA = qw(Geo::Hex::Coder);
+
+require Geo::Hex2;
+
+sub encode {
+    my ( $self, @args ) = @_;
+    @args == 3
+        or Carp::croak('encode() must take 3 args(lat, lon, level).');
+    return Geo::Hex2::latlng2geohex(@args);
+}
+
+sub decode {
+    my ( $self, $code ) = @_;
+    my $zone  = Geo::Hex2::getZoneByCode( $code );
+    my $level = Geo::Hex2::code_to_level( $code );
+    return wantarray ? Geo::Hex2::geohex2latlng( $code ) : [ Geo::Hex2::geohex2latlng( $code ) ];
+}
 
 
 package
