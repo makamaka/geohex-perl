@@ -13,7 +13,7 @@ for my $d ( @decode_data ) {
     my ( $lat, $lon, $level ) = $geohex->decode($code);
     is ( sprintf("%.12f", $lat),   sprintf("%.12f", $check_lat),   "$code - lat" );
     is ( sprintf("%.12f", $lon),   sprintf("%.12f", $check_lon),   "$code - lon" );
-    is ( sprintf("%.12f", $level), sprintf("%.12f", $check_level), "$code - level" );
+    is ( $level, $check_level, "$code - level" );
 }
 
 done_testing;
