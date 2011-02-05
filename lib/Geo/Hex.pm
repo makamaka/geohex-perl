@@ -74,13 +74,9 @@ sub decode {
 
 sub to_zone {
     my ( $self, @args ) = @_;
-    my $zone = @args == 1 ? Geo::Hex3::getZoneByCode( $args[0] )
-             : @args == 3 ? Geo::Hex3::getZoneByLocation(@args)
-             : Carp::croak('encode() must take 3 args(lat, lon, level) or 1 args(Geo::Hex::Zone).');
-
-    $zone->{ level } = length($zone->{ code }) - 2;
-
-    return $zone;
+   return @args == 1 ? Geo::Hex3::getZoneByCode( $args[0] )
+        : @args == 3 ? Geo::Hex3::getZoneByLocation(@args)
+        : Carp::croak('encode() must take 3 args(lat, lon, level) or 1 args(Geo::Hex::Zone).');
 }
 
 
@@ -105,10 +101,9 @@ sub decode {
 
 sub to_zone {
     my ( $self, @args ) = @_;
-    my $zone = @args == 1 ? Geo::Hex2::getZoneByCode( $args[0] )
-             : @args == 3 ? Geo::Hex2::getZoneByLocation(@args)
-             : Carp::croak('encode() must take 3 args(lat, lon, level) or 1 args(Geo::Hex::Zone).');
-    return $zone;
+    return @args == 1 ? Geo::Hex2::getZoneByCode( $args[0] )
+         : @args == 3 ? Geo::Hex2::getZoneByLocation(@args)
+        : Carp::croak('encode() must take 3 args(lat, lon, level) or 1 args(Geo::Hex::Zone).');
 }
 
 
