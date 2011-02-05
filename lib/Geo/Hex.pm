@@ -64,14 +64,12 @@ sub encode {
     my ( $self, @args ) = @_;
     @args == 3
         or Carp::croak('encode() must take 3 args(lat, lon, level).');
-    my $zone = Geo::Hex3::getZoneByLocation(@args);
-    return $zone->{ code };
+    return Geo::Hex3::latlng2geohex(@args);
 }
 
 sub decode {
     my ( $self, $code ) = @_;
-    my $zone = Geo::Hex3::getZoneByCode( $code );
-    return wantarray ? (@{$zone}{qw/lat lon/}, length($code) - 2) : [@{$zone}{qw/lat lon/}, length($code) - 2];
+    return wantarray ? Geo::Hex3::geohex2latlng( $code ) : [ Geo::Hex3::geohex2latlng( $code ) ];
 }
 
 sub to_zone {
@@ -102,7 +100,6 @@ sub encode {
 
 sub decode {
     my ( $self, $code ) = @_;
-    my $zone  = Geo::Hex2::getZoneByCode( $code );
     return wantarray ? Geo::Hex2::geohex2latlng( $code ) : [ Geo::Hex2::geohex2latlng( $code ) ];
 }
 

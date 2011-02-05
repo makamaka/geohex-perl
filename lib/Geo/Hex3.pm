@@ -28,6 +28,25 @@ my %h_key   = map { $_ => $i++ } @h_key;
 $i = 0;
 my @pow = map { 3 ** $_ } 0..17;
 
+#
+# APIs
+#
+
+sub latlng2geohex {
+    return getZoneByLocation(@_)->{code};
+}
+
+
+sub geohex2latlng {
+    my $code = $_[0];
+    my $zone = getZoneByCode( $code );
+    return ( @{ $zone }{qw/lat lon level/} );
+}
+
+#
+#
+#
+
 sub getZoneByLocation {
     my ( $lat, $lon, $level ) = @_;
     $level += 2;
@@ -119,11 +138,12 @@ sub getZoneByLocation {
 
     Geo::Hex::Zone->new({
         code  => $code,
+        level => $level - 2,
         x     => $h_x,
         y     => $h_y,
         lat   => $z_loc_y,
         lon   => $z_loc_x
-    });
+   });
 }
 
 
@@ -208,7 +228,8 @@ sub getZoneByCode {
         y     => $h_y,
         lat   => $h_loc->{lat},
         lon   => $h_loc->{lon},
-        code  => $code
+        code  => $code,
+        level => length($code) - 2,
     });
 }
 
