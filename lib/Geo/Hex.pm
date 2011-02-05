@@ -74,8 +74,8 @@ sub decode {
 
 sub to_zone {
     my ( $self, @args ) = @_;
-   return @args == 1 ? Geo::Hex3::getZoneByCode( $args[0] )
-        : @args == 3 ? Geo::Hex3::getZoneByLocation(@args)
+   return @args == 1 ? Geo::Hex3::geohex2zone( $args[0] )
+        : @args == 3 ? Geo::Hex3::latlng2zone(@args)
         : Carp::croak('encode() must take 3 args(lat, lon, level) or 1 args(Geo::Hex::Zone).');
 }
 
@@ -101,8 +101,8 @@ sub decode {
 
 sub to_zone {
     my ( $self, @args ) = @_;
-    return @args == 1 ? Geo::Hex2::getZoneByCode( $args[0] )
-         : @args == 3 ? Geo::Hex2::getZoneByLocation(@args)
+    return @args == 1 ? Geo::Hex2::geohex2zone( $args[0] )
+         : @args == 3 ? Geo::Hex2::latlng2zone(@args)
         : Carp::croak('encode() must take 3 args(lat, lon, level) or 1 args(Geo::Hex::Zone).');
 }
 
@@ -172,7 +172,7 @@ Geo::Hex - GeoHex decoder/encoder
     
     
     # Explicit export function
-    use Geo::Hex v => 3, qw(latlng2geohex geohex2latlng);
+    use Geo::Hex v => 3, qw(latlng2geohex geohex2latlng latlng2zone code2zone);
     
     # From latitude/longitude to hex code
     $code = latlng2geohex( $lat, $lng, $level );

@@ -39,18 +39,19 @@ BEGIN {
 #
 
 sub latlng2geohex {
-    return getZoneByLocation(@_)->{code};
+    return latlng2zone(@_)->{code};
 }
 
 
 sub geohex2latlng {
-    my $code = $_[0];
-    my $zone = getZoneByCode( $code );
+    my $zone = geohex2zone( $_[0] );
     return ( @{ $zone }{qw/lat lon level/} );
 }
 
 
-sub getZoneByLocation {
+*getZoneByLocation = *latlng2zone;
+
+sub latlng2zone {
     my ( $lat, $lon, $level ) = @_;
 
     $level = 16 unless defined $level;
@@ -151,8 +152,9 @@ sub getZoneByLocation {
     });
 }
 
+*getZoneByCode = *geohex2zone;
 
-sub getZoneByCode {
+sub geohex2zone {
     my $code    = shift;
     my @code    = split( //, $code );
     my $h_size  = _hex_size( $h_key{ $code[0] } );

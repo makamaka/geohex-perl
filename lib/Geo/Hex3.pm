@@ -33,13 +33,12 @@ my @pow = map { 3 ** $_ } 0..17;
 #
 
 sub latlng2geohex {
-    return getZoneByLocation(@_)->{code};
+    return latlng2zone(@_)->{code};
 }
 
 
 sub geohex2latlng {
-    my $code = $_[0];
-    my $zone = getZoneByCode( $code );
+    my $zone = geohex2zone( $_[0] );
     return ( @{ $zone }{qw/lat lon level/} );
 }
 
@@ -47,7 +46,9 @@ sub geohex2latlng {
 #
 #
 
-sub getZoneByLocation {
+*getZoneByLocation = *latlng2zone;
+
+sub latlng2zone {
     my ( $lat, $lon, $level ) = @_;
     $level += 2;
 
@@ -147,7 +148,9 @@ sub getZoneByLocation {
 }
 
 
-sub getZoneByCode {
+*getZoneByCode = *geohex2zone;
+
+sub geohex2zone {
     my $code    = shift;
     my $level   = length($code);
     my $h_size  = __setHexSize($level);
