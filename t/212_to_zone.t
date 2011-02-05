@@ -8,6 +8,8 @@ my @data = location_data();
 
 my $geohex = Geo::Hex->new( v => 2 );
 
+# v2 decode test does not exist. so no sufficent test.
+
 for my $d ( @data ) {
     my ( $lat, $lon, $level, $code) = @$d;
     my $zone = $geohex->to_zone($code);
