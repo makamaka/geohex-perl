@@ -46,7 +46,7 @@ sub latlng2geohex {
 sub geohex2latlng {
     my $code = $_[0];
     my $zone = getZoneByCode( $code );
-    return ( @{ $zone }{qw/lat lon/}, $h_key{ substr( $code, 0, 1 ) } );
+    return ( @{ $zone }{qw/lat lon level/} );
 }
 
 
