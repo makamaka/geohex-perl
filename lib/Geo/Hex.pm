@@ -112,6 +112,20 @@ package
 
 our @ISA = qw(Geo::Hex::Coder);
 
+require Geo::Hex1;
+
+sub encode {
+    my ( $self, @args ) = @_;
+    @args == 3
+        or Carp::croak('encode() must take 3 args(lat, lon, level).');
+    return Geo::Hex1::latlng2geohex(@args);
+}
+
+sub decode {
+    my ( $self, $code ) = @_;
+    return wantarray ? Geo::Hex1::geohex2latlng( $code ) : [ Geo::Hex3::geohex2latlng( $code ) ];
+}
+
 
 1;
 __END__
