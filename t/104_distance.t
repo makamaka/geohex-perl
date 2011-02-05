@@ -1,78 +1,23 @@
 use strict;
-use Test::Base;
-plan tests => 1 * blocks;
+use Test::More;
 use Geo::Hex1;
 
-run {
-    my $block = shift;
-    my ($hex1,$hex2)  = split(/\n/,$block->input);
-    my ($dist)        = split(/\n/,$block->expected);
-
+for ( <DATA> ) {
+    chomp;
+    my ($hex1,$hex2,$dist)  = split/ +/;
     my $tdist = geohex2distance($hex1,$hex2);
-
-    is $dist, $tdist;
+    is $tdist, $dist;
 };
 
-__END__
-===
---- input
-wknR
-wkoR
---- expected
-1
+done_testing;
 
-===
---- input
-wknR
-wkoS
---- expected
-1
-
-===
---- input
-wknR
-wknS
---- expected
-1
-
-===
---- input
-wknR
-wkmR
---- expected
-1
-
-===
---- input
-wknR
-wkmQ
---- expected
-1
-
-===
---- input
-wknR
-wknQ
---- expected
-1
-
-===
---- input
-wknR
-wkmO
---- expected
-3
-
-===
---- input
-wknR
-wklS
---- expected
-3
-
-===
---- input
-8sikg
-8sihc
---- expected
-4
+__DATA__
+wknR    wkoR    1
+wknR    wkoS    1
+wknR    wknS    1
+wknR    wkmR    1
+wknR    wkmQ    1
+wknR    wknQ    1
+wknR    wkmO    3
+wknR    wklS    3
+8sikg   8sihc   4

@@ -1,28 +1,24 @@
 use strict;
-use Test::Base;
-plan tests => 14 * blocks;
+use Test::More;
 use Geo::Hex1;
 
-run {
-    my $block = shift;
-    my ($hex)  = split(/\n/,$block->input);
-    my @points = split(/\n/,$block->expected);
 
-    my @tpoints = @{geohex2polygon($hex)};
+my $hex    = <DATA>; chomp($hex);
+my @points = <DATA>; chomp(@points);
 
-    foreach my $i ( 0..$#tpoints ) {
-        my ( $lat,  $lng  ) = split(/,/,$points[$i]);
-        my ( $tlat, $tlng ) = @{ $tpoints[$i] };
-        is $lat,   sprintf('%.6f',$tlat);
-        is $lng,   sprintf('%.6f',$tlng);
-    }
-};
+my @tpoints = @{geohex2polygon($hex)};
 
-__END__
-===
---- input
+foreach my $i ( 0..$#tpoints ) {
+    my ( $lat,  $lng  ) = split(/,/,$points[$i]);
+    my ( $tlat, $tlng ) = @{ $tpoints[$i] };
+    is $lat,   sprintf('%.6f',$tlat);
+    is $lng,   sprintf('%.6f',$tlng);
+}
+
+done_testing;
+
+__DATA__
 wkmP
---- expected
 35.654108,139.693874
 35.659008,139.697374
 35.659008,139.704374
@@ -30,4 +26,3 @@ wkmP
 35.649208,139.704374
 35.649208,139.697374
 35.654108,139.693874
-

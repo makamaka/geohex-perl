@@ -6,9 +6,7 @@ WriteMakefile(
     'NAME'          => 'Geo::Hex',
     'VERSION_FROM'  => 'lib/Geo/Hex.pm', # finds $VERSION
     'PREREQ_PM' => {
-        'Test::Base'     => 0,
-        'Test::More'     => '0.90',
-        'Exporter'       => 0,
+        'Test::More'     => '0.96',
         'POSIX'          => 0,
         'Math::Round'    => 0,
         'Math::Trig'     => 0,
