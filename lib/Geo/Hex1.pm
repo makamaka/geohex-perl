@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use Carp;
 use Exporter;
-
+use Geo::Hex;
 use POSIX       qw/floor ceil/;
 use Math::Round qw/round/;
 
@@ -24,6 +24,8 @@ my $min_x_lon   = 122930; #与那国島
 my $min_x_lat   = 24448;
 my $min_y_lon   = 141470; #南硫黄島
 my $min_y_lat   = 24228;
+my $h_k         = ( round( ( 1.4 / 3 ) * $h_grid ) ) / $h_grid;
+
 
 # Some internal functions
 
@@ -52,7 +54,6 @@ sub __geohex2hyhx {
 
     my $unit_x = 6.0 * $level * $h_size;
     my $unit_y = 2.8 * $level * $h_size;
-    my $h_k    = ( round( ( 1.4 / 3 ) * $h_grid ) ) / $h_grid;
     my $base_x = floor( ( $min_x_lon + $min_x_lat / $h_k ) / $unit_x );
     my $base_y = floor( ( $min_y_lat - $h_k * $min_y_lon ) / $unit_y );
 
@@ -65,7 +66,7 @@ sub __geohex2hyhx {
         $h_y = index( $h_key, $code[1] ) * 60   + index( $h_key, $code[3] );
     }
     
-    return ( $h_y, $h_x, $level, $unit_x, $unit_y, $h_k, $base_x, $base_y );
+    return ( $h_y, $h_x, $level, $unit_x, $unit_y, $base_x, $base_y );
 }
 
 sub __hyhx2geohex {
@@ -91,10 +92,8 @@ sub __hyhx2geohex {
 
 # Export function for GeoHex
 
-sub latlng2geohex {
-    my $lat   = shift;
-    my $lon   = shift;
-    my $level = shift;
+sub latlng2zone {
+    my ( $lat, $lon, $level ) = @_;
 
     $level = defined( $level ) ? $level : 7;
     croak 'Level must be between 1 and 60' if ( $level !~ /^\d+$/ || $level < 1 || $level > 60 );
@@ -103,7 +102,6 @@ sub latlng2geohex {
     my $lat_grid = $lat * $h_grid;
     my $unit_x   = 6.0  * $level * $h_size;
     my $unit_y   = 2.8  * $level * $h_size;
-    my $h_k      = ( round( (1.4 / 3) * $h_grid) ) / $h_grid;
     my $base_x   = floor( ($min_x_lon + $min_x_lat / $h_k      ) / $unit_x);
     my $base_y   = floor( ($min_y_lat - $h_k       * $min_y_lon) / $unit_y);
     my $h_pos_x  = ( $lon_grid + $lat_grid / $h_k     ) / $unit_x - $base_x;
@@ -126,22 +124,53 @@ sub latlng2geohex {
         }
     }
 
-    return __hyhx2geohex( $h_y, $h_x, $level );
-}
+    my $code = __hyhx2geohex( $h_y, $h_x, $level );
 
-sub geohex2latlng{
-    my $code = shift;
-
-    my ( $lat, $lon );
-    my ( $h_y, $h_x, $level, $unit_x, $unit_y, $h_k, $base_x, $base_y ) = eval { __geohex2hyhx( $code ) };
-    croak $@ if ( $@ );
-    
     my $h_lat = ( $h_k   * ( $h_x + $base_x ) * $unit_x + ( $h_y + $base_y ) * $unit_y ) / 2;
     my $h_lon = ( $h_lat - ( $h_y + $base_y ) * $unit_y ) / $h_k;
     $lat      = $h_lat / $h_grid;
     $lon      = $h_lon / $h_grid;
 
-    return ( $lat, $lon, $level );
+    Geo::Hex::Zone->new({
+        lat     => $lat,
+        lon     => $lon,
+        level   => $level,
+        code    => $code,
+        x       => $h_x,
+        y       => $h_y,
+    });
+}
+
+sub geohex2zone {
+    my $code = shift;
+
+    my ( $lat, $lon );
+    my ( $h_y, $h_x, $level, $unit_x, $unit_y, $base_x, $base_y ) = eval { __geohex2hyhx( $code ) };
+    croak $@ if ( $@ );
+
+    my $h_lat = ( $h_k   * ( $h_x + $base_x ) * $unit_x + ( $h_y + $base_y ) * $unit_y ) / 2;
+    my $h_lon = ( $h_lat - ( $h_y + $base_y ) * $unit_y ) / $h_k;
+    $lat      = $h_lat / $h_grid;
+    $lon      = $h_lon / $h_grid;
+
+    return Geo::Hex::Zone->new({
+        lat     => $lat,
+        lon     => $lon,
+        level   => $level,
+        code    => $code,
+        x       => $h_x,
+        y       => $h_y,
+    });
+}
+
+sub latlng2geohex {
+    return latlng2zone( @_ )->{code};
+}
+
+
+sub geohex2latlng{
+    my $zone = geohex2zone( @_ );
+    return @{$zone}{qw/lat lon level/};
 }
 
 
