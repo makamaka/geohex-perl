@@ -206,27 +206,27 @@ sub geohex2zone {
     my $h_lat_y = ( H_K * $h_x * $unit_x + $h_y * $unit_y ) / 2;
     my $h_lon_x = ( $h_lat_y - $h_y * $unit_y ) / H_K;
 
-    my $h_loc = __xy2loc( $h_lon_x, $h_lat_y );
+    my ( $h_loc_lat, $h_loc_lon ) = _xy2loc( $h_lon_x, $h_lat_y );
 
     # a bad hack for a difference between internal NV and IV.
-    if ( $h_loc->{lon} > 180 or $h_loc->{lon} eq '180' ) {
+    if ( $h_loc_lon > 180 or $h_loc_lon eq '180' ) {
         my $c = 3 ** $level;
         $h_x -= $c;
         $h_y += $c;
     }
 
-    if ( $h_loc->{lon} > 180 ) {
-        $h_loc->{lon} -= 360;
+    if ( $h_loc_lon > 180 ) {
+        $h_loc_lon -= 360;
     }
-    elsif ( $h_loc->{lon} < -180 ) {
-        $h_loc->{lon} += 360;
+    elsif ( $h_loc_lon < -180 ) {
+        $h_loc_lon += 360;
     }
 
     Geo::Hex::Zone->new({
         x     => $h_x,
         y     => $h_y,
-        lat   => $h_loc->{lat},
-        lon   => $h_loc->{lon},
+        lat   => $h_loc_lat,
+        lon   => $h_loc_lon,
         code  => $code,
         level => length($code) - 2,
     });
