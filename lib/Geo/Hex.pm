@@ -10,14 +10,74 @@ our $VERSION = '0.01';
 our @ISA    = qw(Exporter);
 
 our @EXPORT    = qw(decode_geohex encode_geohex);
-our @EXPORT_OK = qw(latlng2geohex geohex2latlng getZoneByLocation getZoneByCode);
+our @EXPORT_OK = qw(latlng2geohex geohex2latlng latlng2zone geohex2zone);
 
 my $Default_SPEC = 3;
+my $Current_SPEC = 0;
 
-sub import {
-
+unless ( $Current_SPEC ) {
+    $Current_SPEC = __PACKAGE__->_set_functions( $Default_SPEC );
 }
 
+
+sub import {
+    my ( $class, %args ) = @_;
+    my $v = delete $args{ v } || delete $args{ version } || $Default_SPEC;
+
+    $v =~ /^[123]$/ or Carp::croak "The GeoHex spec version is allowed to 1 to 3";
+
+    if ( $v != $Current_SPEC ) {
+        $Current_SPEC = $class->_set_functions( $v );
+    }
+
+    $class->export_to_level(1, %args);
+}
+
+
+sub _set_functions {
+    my ( $class, $v ) = @_;
+    my $pkg  = "Geo::Hex$v";
+    (my $path = $pkg . '.pm')  =~ s{::}{/};
+
+    require $path;
+
+    no strict 'refs';
+
+    *_latlng2geohex = *{"$pkg\::latlng2geohex"};
+    *_geohex2latlng = *{"$pkg\::geohex2latlng"};
+    *_latlng2zone   = *{"$pkg\::latlng2zone"};
+    *_geohex2zone   = *{"$pkg\::geohex2zone"};
+
+    return $v;
+}
+
+#
+# FUNCTIONS
+#
+
+*encode_geohex = *latlng2geohex;
+*decode_geohex = *geohex2latlng;
+
+sub latlng2geohex {
+    return _latlng2geohex( @_ );
+}
+
+sub geohex2latlng {
+    return _geohex2latlng( @_ );
+}
+
+sub latlng2zone {
+    return _latlng2zone( @_ );
+}
+
+sub geohex2zone {
+    return _geohex2zone( @_ );
+}
+
+
+#
+# METHODS
+#
 
 sub new {
     my ( $class, @args ) = @_;
@@ -37,7 +97,7 @@ sub spec_version { return $Default_SPEC; }
 
 
 #
-#
+# Coder Class
 #
 
 package Geo::Hex::Coder;
@@ -149,20 +209,12 @@ Geo::Hex - GeoHex decoder/encoder
     
     
     # Explicit export function
-    use Geo::Hex v => 3, qw(latlng2geohex geohex2latlng latlng2zone code2zone);
+    use Geo::Hex v => 3, qw(latlng2geohex geohex2latlng latlng2zone geohex2zone);
     
     # From latitude/longitude to hex code
     $code = latlng2geohex( $lat, $lng, $level );
         # From hex code to center latitude/longitude
     my ( $center_lat, $center_lng, $level ) = geohex2latlng( $code );
-    
-    
-    # Explicit export function - original javascript name
-    use Geo::Hex v => 3, qw(getZoneByLocation getZoneByCode);
-    # From latitude/longitude to zone object*
-    $zone = getZoneByLocation( $lat, $lng, $level );
-    # From hex code to zone object*
-    $zone = getZoneByCode( $code );
 
 =head1 CLASS METHODS
 
@@ -214,27 +266,37 @@ Returns specification version.
 
     ($lat, $lon, $level) = decode_geohex( $code );
 
+Convert latitude/longitude to GeoHex code.
+
 =head2 encode_geohex
 
     $code = encode_geohex( $lat, $lon, $level );
 
+Convert GeoHex code to center latitude/longitude, and level value.
 
 =head1 FUNCTIONS
 
+    use Geo::Hex v => 3;
+
 =head2 latlng2geohex
 
-    latlng2geohex( $lat, $lng, $level );
-    
-    latlng2geohex( $zone );
+    $code = latlng2geohex( $lat, $lon, $level );
 
-Convert latitude/longitude to GeoHex code.
+Same as C<encode_geohex>.
 
 =head2 geohex2latlng
 
-    geohex2latlng( $code );
+    ($lat, $lon, $level) = geohex2latlng( $code );
 
-Convert GeoHex code to center latitude/longitude, and level value.
+Same as C<decode_geohex>.
 
+=head2 latlng2zone
+
+    $zone = latlng2zone( $lat, $lon, $level );
+
+=head2 geohex2zone
+
+    $zone = geohex2zone( $code );
 
 =head1 SEE ALSO
 
