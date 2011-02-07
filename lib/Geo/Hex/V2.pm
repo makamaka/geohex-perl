@@ -58,10 +58,9 @@ sub latlng2zone {
     my $hex_pos;
 
     my $h_size = _hex_size( $level );
-    my $z_xy   = _loc2xy( $lon, $lat );
 
-    my $lon_grid = $z_xy->[0];
-    my $lat_grid = $z_xy->[1];
+    my ($lon_grid, $lat_grid) = _loc2xy( $lat, $lon );
+
     my $unit_x   = 6.0 * $h_size;
     my $unit_y   = 6.0 * $h_size * H_K;
     my $h_pos_x  = ( $lon_grid + $lat_grid / H_K ) / $unit_x;
@@ -91,9 +90,7 @@ sub latlng2zone {
     my $h_lat = ( H_K * $h_x * $unit_x + $h_y * $unit_y ) / 2.0;
     my $h_lon = ( $h_lat - $h_y * $unit_y ) / H_K;
 
-    my $z_loc   = _xy2loc( $h_lon, $h_lat );
-    my $z_loc_x = $z_loc->[0];
-    my $z_loc_y = $z_loc->[1];
+    my ($z_loc_y, $z_loc_x) = _xy2loc( $h_lon, $h_lat );
 
     if ( H_BASE - $h_lon < $h_size ) {
        ( $h_x, $h_y ) = ( $h_y, $h_x );
@@ -194,7 +191,7 @@ sub geohex2zone {
     my $h_lat_y = ( H_K * $h_x * $unit_x + $h_y * $unit_y ) / 2.0;
     my $h_lon_x = ( $h_lat_y - $h_y * $unit_y ) / H_K;
 
-    my ( $h_lon, $h_lat ) = @{ _xy2loc( $h_lon_x, $h_lat_y ) }[0,1];
+    my ( $h_lat, $h_lon ) = _xy2loc( $h_lon_x, $h_lat_y );
 
     return Geo::Hex::Zone::V2->new({
         code  => $code,
@@ -216,7 +213,6 @@ sub getZoneByXY {
     my $h_max   = round( H_BASE / $unit_x + H_BASE / $unit_y );
     my $h_lat_y = ( H_K * $x * $unit_x + $y * $unit_y ) / 2;
     my $h_lon_x = ( $h_lat_y - $y * $unit_y ) / H_K;
-    my $h_loc   = _xy2loc( $h_lon_x, $h_lat_y );
     my $x_p = $x < 0 ? 1 : 0;
     my $y_p = $y < 0 ? 1 : 0;
 
@@ -251,9 +247,11 @@ sub getZoneByXY {
 
     my $zone     = {};
 
+    my ($lat, $lon) = _xy2loc( $h_lon_x, $h_lat_y );
+
     $zone->{code} = $h_code;
-    $zone->{lat}  = $h_loc->[1];
-    $zone->{lon}  = $h_loc->[0];
+    $zone->{lat}  = $lat;
+    $zone->{lon}  = $lon;
     $zone->{x}    = $x;
     $zone->{y}    = $y;
 
@@ -296,10 +294,21 @@ sub _hex_size {
 
 
 sub _loc2xy {
-    my ( $lon, $lat ) = @_;
+    my ( $lat, $lon ) = @_;
     my $x = $lon * H_BASE / 180;
     my $y = H_BASE * log( tan( ( 90 + $lat ) * PI / 360) ) / ( PI / 180 ) / 180;
-    return [ $x, $y ];
+    return ( $x, $y );
+}
+
+
+sub _xy2loc {
+    my ( $x, $y ) = @_;
+    my $lon = ( $x / H_BASE ) * 180;
+    my $lat = ( $y / H_BASE ) * 180;
+    $lat = 180 / PI * ( 2 * atan( exp( $lat * PI / 180 ) ) - PI / 2 );
+    return ( $lat, $lon );
+}
+
 
 package
     Geo::Hex::Zone::V2;
@@ -315,15 +324,6 @@ sub hex_size {
     return exists $_[0]->{ _cache_hex_size }
                 ? $_[0]->{ _cache_hex_size }
                 : $_[0]->{ _cache_hex_size } = Geo::Hex::V2::_hex_size( $_[0]->level );
-}
-
-
-sub _xy2loc {
-    my ( $x, $y ) = @_;
-    my $lon = ( $x / H_BASE ) * 180;
-    my $lat = ( $y / H_BASE ) * 180;
-    $lat = 180 / PI * ( 2 * atan( exp( $lat * PI / 180 ) ) - PI / 2 );
-    return [ $lon, $lat ];
 }
 
 sub hex_coords {
