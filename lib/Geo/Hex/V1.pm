@@ -5,13 +5,14 @@ use warnings;
 use strict;
 use Carp;
 use Exporter;
-use Geo::Hex::Zone;
 use POSIX       qw/floor ceil/;
 use Math::Round qw/round/;
 
 our $VERSION = '0.03';
 our @ISA     = qw(Exporter);
-our @EXPORT  = qw(latlng2geohex geohex2latlng geohex2polygon geohex2distance distance2geohexes);
+our @EXPORT  = qw(
+    latlng2geohex geohex2latlng latlng2zone geohex2zone geohex2polygon geohex2distance distance2geohexes
+);
 
 # Constants
 

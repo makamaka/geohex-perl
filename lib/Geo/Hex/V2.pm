@@ -15,7 +15,7 @@ our $VERSION = '0.02_01';
 use vars qw(@ISA @EXPORT);
 use Exporter;
 @ISA    = qw(Exporter);
-@EXPORT = qw(latlng2geohex geohex2latlng getZoneByLocation getZoneByCode);
+@EXPORT = qw(latlng2geohex geohex2latlng latlng2zone geohex2zone);
 
 
 # Constants
