@@ -29,9 +29,7 @@ sub new {
 
     $v =~ /^[123]$/ or Carp::croak "The GeoHex spec version is allowed to 1 to 3";
 
-    my $pkg = $class . $v . '::Coder';
-
-    return bless { v => $v }, $pkg;
+    return Geo::Hex::Coder->new( v => $v );
 }
 
 
@@ -42,96 +40,75 @@ sub spec_version { return $Default_SPEC; }
 #
 #
 
-package
-    Geo::Hex::Coder;
+package Geo::Hex::Coder;
+
+use warnings;
+use strict;
+
+my %CoderVersion;
+
+
+sub new {
+    my ( $class, %opt ) = @_;
+    my $v = $opt{ v };
+    unless ( $v ) {
+        Carp::croak('GeoHex version must be specified.');
+    }
+
+    my $pkg = $CoderVersion{ $v };
+
+    unless ( $CoderVersion{ $v } ) {
+       $pkg = $CoderVersion{ $v } =  $class->_make_coder_class( $v );
+    }
+
+    bless { v => $v }, $pkg;
+}
+
 
 sub spec_version {
     $_[0]->{v};
 }
 
-sub encode {}
 
-sub decode {}
+sub _make_coder_class {
+    my ( $class, $v ) = @_;
 
-package
-    Geo::Hex3::Coder;
+    my $pkg = 'Geo::Hex' . $v  . '::Coder';
+
+
+    eval sprintf( <<'MODULE', $pkg, $v );
+package %s;
+
+use strict;
+require Geo::Hex%d;
 
 our @ISA = qw(Geo::Hex::Coder);
-
-require Geo::Hex3;
 
 sub encode {
     my ( $self, @args ) = @_;
     @args == 3
         or Carp::croak('encode() must take 3 args(lat, lon, level).');
-    return Geo::Hex3::latlng2geohex(@args);
+    return Geo::Hex%2$d::latlng2geohex(@args);
 }
 
 sub decode {
     my ( $self, $code ) = @_;
-    return wantarray ? Geo::Hex3::geohex2latlng( $code ) : [ Geo::Hex3::geohex2latlng( $code ) ];
+    return Geo::Hex%2$d::geohex2latlng( $code );
 }
 
 sub to_zone {
     my ( $self, @args ) = @_;
-   return @args == 1 ? Geo::Hex3::geohex2zone( $args[0] )
-        : @args == 3 ? Geo::Hex3::latlng2zone(@args)
+   return @args == 1 ? Geo::Hex%2$d::geohex2zone( $args[0] )
+        : @args == 3 ? Geo::Hex%2$d::latlng2zone(@args)
         : Carp::croak('encode() must take 3 args(lat, lon, level) or 1 args(Geo::Hex::Zone).');
 }
+MODULE
 
+    Carp::croak( $@ ) if $@;
 
-package
-    Geo::Hex2::Coder;
-
-our @ISA = qw(Geo::Hex::Coder);
-
-require Geo::Hex2;
-
-sub encode {
-    my ( $self, @args ) = @_;
-    @args == 3
-        or Carp::croak('encode() must take 3 args(lat, lon, level).');
-    return Geo::Hex2::latlng2geohex(@args);
+    return $pkg;
 }
 
-sub decode {
-    my ( $self, $code ) = @_;
-    return wantarray ? Geo::Hex2::geohex2latlng( $code ) : [ Geo::Hex2::geohex2latlng( $code ) ];
-}
-
-sub to_zone {
-    my ( $self, @args ) = @_;
-    return @args == 1 ? Geo::Hex2::geohex2zone( $args[0] )
-         : @args == 3 ? Geo::Hex2::latlng2zone(@args)
-        : Carp::croak('encode() must take 3 args(lat, lon, level) or 1 args(Geo::Hex::Zone).');
-}
-
-
-package
-    Geo::Hex1::Coder;
-
-our @ISA = qw(Geo::Hex::Coder);
-
-require Geo::Hex1;
-
-sub encode {
-    my ( $self, @args ) = @_;
-    @args == 3
-        or Carp::croak('encode() must take 3 args(lat, lon, level).');
-    return Geo::Hex1::latlng2geohex(@args);
-}
-
-sub decode {
-    my ( $self, $code ) = @_;
-    return wantarray ? Geo::Hex1::geohex2latlng( $code ) : [ Geo::Hex3::geohex2latlng( $code ) ];
-}
-
-sub to_zone {
-    my ( $self, @args ) = @_;
-    return @args == 1 ? Geo::Hex1::geohex2zone( $args[0] )
-         : @args == 3 ? Geo::Hex1::latlng2zone(@args)
-         : Carp::croak('encode() must take 3 args(lat, lon, level) or 1 args(Geo::Hex::Zone).');
-}
 
 
 1;
