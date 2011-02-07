@@ -22,6 +22,8 @@ sub code  { $_[0]->{code} }
 
 sub level { $_[0]->{level} }
 
+sub lng { $_[0]->lon }
+
 
 1;
 __END__

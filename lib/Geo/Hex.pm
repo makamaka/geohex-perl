@@ -185,6 +185,8 @@ Geo::Hex - GeoHex decoder/encoder
     # OO-style
     my $geohex = Geo::Hex->new( version => 3 ); # v3 by default
     
+    $geohex->spec_version; # => 3
+    
     my ($lat, $lon, $level) = $geohex->decode( 'XM4885487' );
     my $code                = $geohex->encode( $lat, $lon, $level );
     # => XM4885487
@@ -200,13 +202,12 @@ Geo::Hex - GeoHex decoder/encoder
     # $zone->x     : Mercator X coordinate of given GeoHex's center point 
     # $zone->y     : Mercator Y coordinate of given GeoHex's center point 
     
-    $geohex->spec_version; # => 3
+    my $polygon = $zone->hex_coords; # return the hex coords (six points hold lat and lon)
     
     
     # Export function - GeoHex v3 by default
     ($lat, $lon, $level) = decode_geohex( $code );
     $code = encode_geohex( $lat, $lon, $level );
-    
     
     # Explicit export function
     use Geo::Hex v => 3, qw(latlng2geohex geohex2latlng latlng2zone geohex2zone);
@@ -300,12 +301,13 @@ Same as C<decode_geohex>.
 
 =head1 SEE ALSO
 
+L<https://sites.google.com/site/geohexdocs/>,
 L<http://geogames.net/geohex/v3>
 
-L<Geo::Hex::Zone>, 
-L<Geo::Hex1>,
-L<Geo::Hex2>,
-L<Geo::Hex3>
+L<Geo::Hex::V1>,
+L<Geo::Hex::V2>,
+L<Geo::Hex::V3>,
+L<Geo::Hex::Zone>
 
 =head1 AUTHOR
 
