@@ -1,4 +1,4 @@
-package Geo::Hex2;
+package Geo::Hex::V2;
 
 # code from http://geohex.net/hex_v2.03_core.js
 
@@ -318,12 +318,12 @@ __END__
 
 =head1 NAME
 
-Geo::Hex2 - Convert between latitude/longitude and GeoHex code (version 2:world wide)
+Geo::Hex::V2 - Convert between latitude/longitude and GeoHex code (version 2:world wide)
 
 
 =head1 SYNOPSIS
 
-    use Geo::Hex;
+    use Geo::Hex::V2;
     
     # From latitude/longitude to hex code
     

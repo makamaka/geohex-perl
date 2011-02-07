@@ -1,4 +1,4 @@
-package Geo::Hex1;
+package Geo::Hex::V1;
 
 use 5.006;
 use warnings;
@@ -239,7 +239,7 @@ __END__
 
 =head1 NAME
 
-Geo::Hex1 - Convert between latitude/longitude and GeoHex code version 1
+Geo::Hex::V1 - Convert between latitude/longitude and GeoHex code version 1
 
 
 =head1 SYNOPSIS

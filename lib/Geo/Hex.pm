@@ -36,8 +36,8 @@ sub import {
 
 sub _set_functions {
     my ( $class, $v ) = @_;
-    my $pkg  = "Geo::Hex$v";
-    (my $path = $pkg . '.pm')  =~ s{::}{/};
+    my $pkg  = "Geo::Hex::V$v";
+    (my $path = $pkg . '.pm')  =~ s{::}{/}g;
 
     require $path;
 
@@ -140,7 +140,7 @@ sub _make_coder_class {
 package %s;
 
 use strict;
-require Geo::Hex%d;
+require Geo::Hex::V%d;
 
 our @ISA = qw(Geo::Hex::Coder);
 
@@ -148,18 +148,18 @@ sub encode {
     my ( $self, @args ) = @_;
     @args == 3
         or Carp::croak('encode() must take 3 args(lat, lon, level).');
-    return Geo::Hex%2$d::latlng2geohex(@args);
+    return Geo::Hex::V%2$d::latlng2geohex(@args);
 }
 
 sub decode {
     my ( $self, $code ) = @_;
-    return Geo::Hex%2$d::geohex2latlng( $code );
+    return Geo::Hex::V%2$d::geohex2latlng( $code );
 }
 
 sub to_zone {
     my ( $self, @args ) = @_;
-   return @args == 1 ? Geo::Hex%2$d::geohex2zone( $args[0] )
-        : @args == 3 ? Geo::Hex%2$d::latlng2zone(@args)
+   return @args == 1 ? Geo::Hex::V%2$d::geohex2zone( $args[0] )
+        : @args == 3 ? Geo::Hex::V%2$d::latlng2zone(@args)
         : Carp::croak('encode() must take 3 args(lat, lon, level) or 1 args(Geo::Hex::Zone).');
 }
 MODULE

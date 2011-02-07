@@ -1,4 +1,4 @@
-package Geo::Hex3;
+package Geo::Hex::V3;
 
 use 5.008;
 use warnings;
@@ -291,7 +291,7 @@ __END__
 
 =head1 NAME
 
-Geo::Hex3 - GeoHex v3 encoder/decoder
+Geo::Hex::V3 - GeoHex vresion 3
 
 =head1 DESCRIPTION
 
@@ -311,7 +311,7 @@ GeoHex by @sa2da (http://geogames.net) is licensed under
 Creative Commons BY-SA 2.1 Japan License.
 
 Copyright 2011
-Geo::Hex3 - GeoHex perl implementation by soh335
+Geo::Hex::V3 - GeoHex perl implementation by soh335
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
