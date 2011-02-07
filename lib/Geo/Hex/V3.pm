@@ -51,7 +51,7 @@ sub latlng2zone {
     my ( $lat, $lon, $level ) = @_;
     $level += 2;
 
-    my $h_size    = __setHexSize( $level );
+    my $h_size    = _hex_size( $level );
 
     my ( $lon_grid, $lat_grid ) = _loc2xy( $lat, $lon );
     my $unit_x    = 6.0 * $h_size;
@@ -148,7 +148,7 @@ sub latlng2zone {
 sub geohex2zone {
     my $code    = shift;
     my $level   = length($code);
-    my $h_size  = __setHexSize($level);
+    my $h_size  = _hex_size($level);
     my $unit_x  = 6.0 * $h_size;
     my $unit_y  = 6.0 * $h_size * H_K;
     my $h_x     = 0.0;
@@ -262,7 +262,7 @@ sub _to_base {
     return length $result ? $result : 0;
 }
 
-sub __setHexSize {
+sub _hex_size {
   return H_BASE / 3.0 ** ( $_[0] + 1 );
 }
 
