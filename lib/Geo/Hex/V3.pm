@@ -5,7 +5,6 @@ use warnings;
 use strict;
 use Carp ();
 
-use Geo::Hex::Zone;
 use POSIX qw/floor ceil/;
 use Math::Round  ();
 use Math::Trig   ();
@@ -133,7 +132,7 @@ sub latlng2zone {
     my $head3 = substr( $h_code, 0, 3 );
     my $code  = $h_key[ int( $head3 / 30.0 ) ] . $h_key[ $head3 % 30 ] . substr( $h_code, 3 );
 
-    Geo::Hex::Zone->new({
+    Geo::Hex::Zone::V3->new({
         code  => $code,
         level => $level - 2,
         x     => $h_x,
@@ -222,7 +221,7 @@ sub geohex2zone {
         $h_loc_lon += 360;
     }
 
-    Geo::Hex::Zone->new({
+    Geo::Hex::Zone::V3->new({
         x     => $h_x,
         y     => $h_y,
         lat   => $h_loc_lat,
@@ -281,6 +280,48 @@ sub _xy2loc {
     my $lat = 180 * ($y / H_BASE);
     $lat = 180 / PI * ( 2 * Math::Trig::atan( exp( $lat * PI / 180 ) ) - PI / 2 );
     return ( $lat, $lon );
+}
+
+
+
+package
+    Geo::Hex::Zone::V3;
+
+use Geo::Hex::Zone;
+our @ISA = 'Geo::Hex::Zone';
+
+use constant H_DEG => Math::Trig::tan( Math::Trig::pi * 60 / 180 );
+
+sub spec_version { 3; }
+
+sub hex_size {
+    return exists $_[0]->{ _cache_hex_size }
+                ? $_[0]->{ _cache_hex_size }
+                : $_[0]->{ _cache_hex_size } = Geo::Hex::V3::_hex_size( $_[0]->level + 2 );
+}
+
+sub hex_coords {
+    my ( $lat, $lon ) = ( $_[0]->lat, $_[0]->lon );
+    my ( $h_x, $h_y ) = Geo::Hex::V3::_loc2xy( $lat, $lon );
+    my $hex_size      = $_[0]->hex_size;
+
+    my $top    = ( Geo::Hex::V3::_xy2loc( $h_x, $h_y + H_DEG * $hex_size ) )[0];
+    my $bottom = ( Geo::Hex::V3::_xy2loc( $h_x, $h_y - H_DEG * $hex_size ) )[0];
+
+    my $left   = ( Geo::Hex::V3::_xy2loc( $h_x - 2 * $hex_size, $h_y ) )[1];
+    my $right  = ( Geo::Hex::V3::_xy2loc( $h_x + 2 * $hex_size, $h_y ) )[1];
+
+    my $cleft  = ( Geo::Hex::V3::_xy2loc( $h_x - 1 * $hex_size, $h_y ) )[1];
+    my $cright = ( Geo::Hex::V3::_xy2loc( $h_x + 1 * $hex_size, $h_y ) )[1];
+
+    return [
+        [ $lat, $left ],
+        [ $top, $cleft ],
+        [ $top, $cright ],
+        [ $lat, $right ],
+        [ $bottom, $cright ],
+        [ $bottom, $cleft ],
+    ];
 }
 
 

@@ -132,7 +132,7 @@ sub latlng2zone {
     $lat      = $h_lat / $h_grid;
     $lon      = $h_lon / $h_grid;
 
-    Geo::Hex::Zone->new({
+    Geo::Hex::Zone::V1->new({
         lat     => $lat,
         lon     => $lon,
         level   => $level,
@@ -154,7 +154,7 @@ sub geohex2zone {
     $lat      = $h_lat / $h_grid;
     $lon      = $h_lon / $h_grid;
 
-    return Geo::Hex::Zone->new({
+    return Geo::Hex::Zone::V1->new({
         lat     => $lat,
         lon     => $lon,
         level   => $level,
@@ -234,6 +234,25 @@ sub distance2geohexes {
     
     return \@results;
 }
+
+
+package
+    Geo::Hex::Zone::V1;
+
+use Geo::Hex::Zone;
+our @ISA = 'Geo::Hex::Zone';
+
+sub spec_version { 1; }
+
+sub hex_size { return 0.5; }
+
+sub hex_coords {
+    my $polygon = Geo::Hex::V1::geohex2polygon( $_[0]->code );
+    pop( @$polygon );
+    return $polygon;
+}
+
+
 
 1; # Magic true value required at end of module
 __END__

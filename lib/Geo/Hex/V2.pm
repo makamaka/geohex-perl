@@ -5,7 +5,6 @@ package Geo::Hex::V2;
 use warnings;
 use strict;
 use Carp ();
-use Geo::Hex::Zone;
 
 use POSIX       qw( floor ceil );
 use Math::Round qw( round );
@@ -142,7 +141,7 @@ sub latlng2zone {
     }
     $h_code = $h_code . $h_key[$h_x_1] . $h_key[$h_y_1];
 
-    return Geo::Hex::Zone->new({
+    return Geo::Hex::Zone::V2->new({
         code  => $h_code,
         lat   => $z_loc_y,
         lon   => $z_loc_x,
@@ -197,7 +196,7 @@ sub geohex2zone {
 
     my ( $h_lon, $h_lat ) = @{ _xy2loc( $h_lon_x, $h_lat_y ) }[0,1];
 
-    return Geo::Hex::Zone->new({
+    return Geo::Hex::Zone::V2->new({
         code  => $code,
         lat   => $h_lat,
         lon   => $h_lon,
@@ -301,6 +300,21 @@ sub _loc2xy {
     my $x = $lon * H_BASE / 180;
     my $y = H_BASE * log( tan( ( 90 + $lat ) * PI / 360) ) / ( PI / 180 ) / 180;
     return [ $x, $y ];
+
+package
+    Geo::Hex::Zone::V2;
+
+use Geo::Hex::Zone;
+our @ISA = 'Geo::Hex::Zone';
+
+use constant H_DEG => Math::Trig::tan( Math::Trig::pi * 60 / 180 );
+
+sub spec_version { 2; }
+
+sub hex_size {
+    return exists $_[0]->{ _cache_hex_size }
+                ? $_[0]->{ _cache_hex_size }
+                : $_[0]->{ _cache_hex_size } = Geo::Hex::V2::_hex_size( $_[0]->level );
 }
 
 
@@ -312,6 +326,29 @@ sub _xy2loc {
     return [ $lon, $lat ];
 }
 
+sub hex_coords {
+    my ( $lat, $lon ) = ( $_[0]->lat, $_[0]->lon );
+    my ( $h_x, $h_y ) = Geo::Hex::V2::_loc2xy( $lat, $lon );
+    my $hex_size      = $_[0]->hex_size;
+
+    my $top    = ( Geo::Hex::V2::_xy2loc( $h_x, $h_y + H_DEG * $hex_size ) )[0];
+    my $bottom = ( Geo::Hex::V2::_xy2loc( $h_x, $h_y - H_DEG * $hex_size ) )[0];
+
+    my $left   = ( Geo::Hex::V2::_xy2loc( $h_x - 2 * $hex_size, $h_y ) )[1];
+    my $right  = ( Geo::Hex::V2::_xy2loc( $h_x + 2 * $hex_size, $h_y ) )[1];
+
+    my $cleft  = ( Geo::Hex::V2::_xy2loc( $h_x - 1 * $hex_size, $h_y ) )[1];
+    my $cright = ( Geo::Hex::V2::_xy2loc( $h_x + 1 * $hex_size, $h_y ) )[1];
+
+    return [
+        [ $lat, $left ],
+        [ $top, $cleft ],
+        [ $top, $cright ],
+        [ $lat, $right ],
+        [ $bottom, $cright ],
+        [ $bottom, $cleft ],
+    ];
+}
 
 1;
 __END__
