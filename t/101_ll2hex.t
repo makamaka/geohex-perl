@@ -1,7 +1,7 @@
 use strict;
 
 use Test::More;
-use Geo::Hex1;
+use Geo::Hex::V1;
 
 for ( <DATA> ) {
     chomp;
