@@ -16,8 +16,8 @@ for my $d ( @data ) {
 
     next unless defined $code1;
 
-    my $start_zone = getZoneByCode( $code1 );
-    my $end_zone   = getZoneByCode( $code2 );
+    my $start_zone = geohex2zone( $code1 );
+    my $end_zone   = geohex2zone( $code2 );
     print Dumper([ $start_zone, $end_zone ]);
     is( Geo::Hex::V2::getSteps( $start_zone, $end_zone ), $steps, "$code1 - $code2" );
 }
