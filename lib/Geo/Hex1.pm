@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use Carp;
 use Exporter;
-use Geo::Hex;
+use Geo::Hex::Zone;
 use POSIX       qw/floor ceil/;
 use Math::Round qw/round/;
 
