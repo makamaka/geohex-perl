@@ -54,9 +54,7 @@ sub latlng2zone {
 
     my $h_size    = __setHexSize( $level );
 
-    my $z_xy      = __loc2xy( $lon, $lat );
-    my $lon_grid  = $z_xy->{x};
-    my $lat_grid  = $z_xy->{y};
+    my ( $lon_grid, $lat_grid ) = _loc2xy( $lat, $lon );
     my $unit_x    = 6.0 * $h_size;
     my $unit_y    = 6.0 * $h_size * H_K;
     my $h_pos_x   = ( $lon_grid + $lat_grid / H_K ) / $unit_x;
@@ -84,9 +82,7 @@ sub latlng2zone {
     my $h_lat = ( H_K * $h_x * $unit_x + $h_y * $unit_y ) / 2;
     my $h_lon = ( $h_lat - $h_y * $unit_y ) / H_K;
 
-    my $z_loc   = __xy2loc( $h_lon, $h_lat );
-    my $z_loc_x = $z_loc->{lon};
-    my $z_loc_y = $z_loc->{lat};
+    my ( $z_loc_y, $z_loc_x ) = _xy2loc( $h_lon, $h_lat );
 
     if ( H_BASE - $h_lon < $h_size ) {
         $z_loc_x  = 180;
@@ -271,20 +267,20 @@ sub __setHexSize {
   return H_BASE / 3.0 ** ( $_[0] + 1 );
 }
 
-sub __loc2xy {
-    my ($lon, $lat) = @_;
+sub _loc2xy {
+    my ($lat, $lon) = @_;
     my $x = $lon * H_BASE / 180;
     my $y = log( Math::Trig::tan( ( 90 + $lat ) * PI / 360 ) ) / ( PI / 180 );
     $y *= H_BASE / 180;
-    { x => $x, y => $y };
+    return ( $x, $y );
 }
 
-sub __xy2loc {
+sub _xy2loc {
     my ( $x, $y ) = @_;
     my $lon = 180 * ($x / H_BASE);
     my $lat = 180 * ($y / H_BASE);
     $lat = 180 / PI * ( 2 * Math::Trig::atan( exp( $lat * PI / 180 ) ) - PI / 2 );
-    { lon => $lon, lat => $lat };
+    return ( $lat, $lon );
 }
 
 
