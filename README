@@ -15,6 +15,8 @@ SYNOPSIS
         # OO-style
         my $geohex = Geo::Hex->new( version => 3 ); # v3 by default
     
+        $geohex->spec_version; # => 3
+    
         my ($lat, $lon, $level) = $geohex->decode( 'XM4885487' );
         my $code                = $geohex->encode( $lat, $lon, $level );
         # => XM4885487
@@ -30,29 +32,20 @@ SYNOPSIS
         # $zone->x     : Mercator X coordinate of given GeoHex's center point 
         # $zone->y     : Mercator Y coordinate of given GeoHex's center point 
     
-        $geohex->spec_version; # => 3
+        my $polygon = $zone->hex_coords; # return the hex coords (six points hold lat and lon)
     
     
         # Export function - GeoHex v3 by default
         ($lat, $lon, $level) = decode_geohex( $code );
         $code = encode_geohex( $lat, $lon, $level );
     
-    
         # Explicit export function
-        use Geo::Hex v => 3, qw(latlng2geohex geohex2latlng);
+        use Geo::Hex v => 3, qw(latlng2geohex geohex2latlng latlng2zone geohex2zone);
     
         # From latitude/longitude to hex code
         $code = latlng2geohex( $lat, $lng, $level );
             # From hex code to center latitude/longitude
         my ( $center_lat, $center_lng, $level ) = geohex2latlng( $code );
-    
-    
-        # Explicit export function - original javascript name
-        use Geo::Hex v => 3, qw(getZoneByLocation getZoneByCode);
-        # From latitude/longitude to zone object*
-        $zone = getZoneByLocation( $lat, $lng, $level );
-        # From hex code to zone object*
-        $zone = getZoneByCode( $code );
 
 CLASS METHODS
   new
@@ -85,26 +78,37 @@ EXPORT FUNCTIONS
   decode_geohex
         ($lat, $lon, $level) = decode_geohex( $code );
 
+    Convert latitude/longitude to GeoHex code.
+
   encode_geohex
         $code = encode_geohex( $lat, $lon, $level );
 
-FUNCTIONS
-  latlng2geohex
-        latlng2geohex( $lat, $lng, $level );
-    
-        latlng2geohex( $zone );
-
-    Convert latitude/longitude to GeoHex code.
-
-  geohex2latlng
-        geohex2latlng( $code );
-
     Convert GeoHex code to center latitude/longitude, and level value.
 
-SEE ALSO
-    <http://geogames.net/geohex/v3>
+FUNCTIONS
+        use Geo::Hex v => 3;
 
-    Geo::Hex::Zone, Geo::Hex1, Geo::Hex2, Geo::Hex3
+  latlng2geohex
+        $code = latlng2geohex( $lat, $lon, $level );
+
+    Same as "encode_geohex".
+
+  geohex2latlng
+        ($lat, $lon, $level) = geohex2latlng( $code );
+
+    Same as "decode_geohex".
+
+  latlng2zone
+        $zone = latlng2zone( $lat, $lon, $level );
+
+  geohex2zone
+        $zone = geohex2zone( $code );
+
+SEE ALSO
+    https://sites.google.com/site/geohexdocs/,
+    http://geogames.net/geohex/v3
+
+    Geo::Hex::V1, Geo::Hex::V2, Geo::Hex::V3, Geo::Hex::Zone
 
 AUTHOR
     Makamaka Hannyaharamitu
