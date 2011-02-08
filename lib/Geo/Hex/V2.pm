@@ -70,8 +70,6 @@ sub geohex2latlng {
 }
 
 
-*getZoneByLocation = *latlng2zone;
-
 sub latlng2zone {
     my ( $lat, $lon, $level ) = @_;
 
@@ -170,7 +168,6 @@ sub latlng2zone {
     });
 }
 
-*getZoneByCode = *geohex2zone;
 
 sub geohex2zone {
     my $code    = shift;
@@ -226,7 +223,7 @@ sub geohex2zone {
 }
 
 
-sub getZoneByXY {
+sub xy2zone {
     my ( $x, $y, $level ) = @_;
     my $scl = $level;
     my $h_size  =  _hex_size( $level );
@@ -281,7 +278,7 @@ sub getZoneByXY {
 }
 
 
-sub getSteps {
+sub zone_steps {
     my ( $start_zone, $end_zone ) = @_;
     my $x = $end_zone->{ x } - $start_zone->{ x };
     my $y = $end_zone->{ y } - $start_zone->{ y };
