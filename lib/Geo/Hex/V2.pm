@@ -2,6 +2,34 @@ package Geo::Hex::V2;
 
 # code from http://geohex.net/hex_v2.03_core.js
 
+our $VERSION = '0.02_01';
+use vars qw(@ISA @EXPORT);
+use Exporter;
+@ISA    = qw(Exporter);
+@EXPORT    = qw(latlng2geohex geohex2latlng latlng2zone geohex2zone);
+@EXPORT_OK = qw(xy2zone zone_steps);
+
+if( not $ENV{PERL_ONLY} ) {
+    eval { require Geo::Hex::V2::XS };
+    unless ( $@ ) {
+        *latlng2geohex = *Geo::Hex::V2::XS::latlng2geohex;
+        *geohex2latlng = *Geo::Hex::V2::XS::geohex2latlng;
+        *latlng2zone   = *Geo::Hex::V2::XS::latlng2zone;
+        *geohex2zone   = *Geo::Hex::V2::XS::geohex2zone;
+        *xy2zone       = *Geo::Hex::V2::XS::xy2zone;
+        *zone_steps    = *Geo::Hex::V2::XS::zone_steps;
+    }
+}
+
+if ( not defined &Geo::Hex::V2::latlng2geohex ) {
+    local $/;
+    my $code = <DATA>;
+    eval $code;
+}
+
+1;
+__DATA__
+package Geo::Hex::V2;
 use warnings;
 use strict;
 use Carp ();
@@ -9,12 +37,6 @@ use Carp ();
 use POSIX       qw( floor ceil );
 use Math::Round qw( round );
 use Math::Trig  qw( tan atan );
-
-our $VERSION = '0.02_01';
-use vars qw(@ISA @EXPORT);
-use Exporter;
-@ISA    = qw(Exporter);
-@EXPORT = qw(latlng2geohex geohex2latlng latlng2zone geohex2zone);
 
 
 # Constants
