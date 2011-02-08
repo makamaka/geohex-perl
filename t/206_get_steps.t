@@ -19,7 +19,7 @@ for my $d ( @data ) {
     my $start_zone = geohex2zone( $code1 );
     my $end_zone   = geohex2zone( $code2 );
     print Dumper([ $start_zone, $end_zone ]);
-    is( Geo::Hex::V2::getSteps( $start_zone, $end_zone ), $steps, "$code1 - $code2" );
+    is( Geo::Hex::V2::zone_steps( $start_zone, $end_zone ), $steps, "$code1 - $code2" );
 }
 
 =pod
