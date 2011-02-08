@@ -1,9 +1,9 @@
 Changes
 lib/Geo/Hex.pm
+lib/Geo/Hex/V1.pm
+lib/Geo/Hex/V2.pm
+lib/Geo/Hex/V3.pm
 lib/Geo/Hex/Zone.pm
-lib/Geo/Hex1.pm
-lib/Geo/Hex2.pm
-lib/Geo/Hex3.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
@@ -15,6 +15,10 @@ t/102_hex2ll.t
 t/103_hex2polycon.t
 t/104_distance.t
 t/105_geohexes.t
+t/110_encode.t
+t/111_decode.t
+t/112_to_zone.t
+t/120_zone_methods.t
 t/201_get_zone_by_loc.t
 t/202_get_zone_by_code.t
 t/203_latlng2geohex.t
@@ -24,12 +28,15 @@ t/206_get_steps.t
 t/210_encode.t
 t/211_decode.t
 t/212_to_zone.t
+t/220_zone_methods.t
 t/300_load_v3.t
 t/301_get_zone_by_loc.t
 t/302_get_zone_by_code.t
 t/310_encode.t
 t/311_decode.t
 t/312_to_zone.t
+t/313_encode_geohex.t
+t/320_zone_methods.t
 t/decode_data.pl
 t/encode_data.pl
 t/location_data.pl
