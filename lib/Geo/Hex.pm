@@ -30,7 +30,7 @@ sub import {
         $Current_SPEC = $class->_set_functions( $v );
     }
 
-    $class->export_to_level(1, %args);
+    $class->export_to_level(1, undef, %args);
 }
 
 
