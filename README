@@ -47,6 +47,9 @@ SYNOPSIS
             # From hex code to center latitude/longitude
         my ( $center_lat, $center_lng, $level ) = geohex2latlng( $code );
 
+VERSION
+    This is a beta version, so interfaces may be changed in future.
+
 CLASS METHODS
   new
         $geohex = Geo::Hex->new( %option );
@@ -74,6 +77,8 @@ INSTANCE METHODS
         $zone = $geohex->to_zone( $lat, $lon, $level );
 
   spec_version
+    Returns specification version.
+
 EXPORT FUNCTIONS
   decode_geohex
         ($lat, $lon, $level) = decode_geohex( $code );
@@ -101,23 +106,37 @@ FUNCTIONS
   latlng2zone
         $zone = latlng2zone( $lat, $lon, $level );
 
+    Takes a location and its level, and returns GeoHex::Zone.
+
   geohex2zone
         $zone = geohex2zone( $code );
 
+    Takes a geohex code and returns GeoHex::Zone.
+
 SEE ALSO
-    https://sites.google.com/site/geohexdocs/,
-    http://geogames.net/geohex/v3
+    <https://sites.google.com/site/geohexdocs/>,
+    <http://geogames.net/geohex/v3>
 
     Geo::Hex::V1, Geo::Hex::V2, Geo::Hex::V3, Geo::Hex::Zone
 
-AUTHOR
+AUTHORS
+    Frontend module Geo::Hex by Makamaka Hannyaharamitu
+
+    Geo::Hex::V1 are originally written by OHTSUKA Ko-hei
+    "<nene@kokogiko.net>"
+
+    Geo::Hex::V2 are originally written by OHTSUKA Ko-hei and maintained by
     Makamaka Hannyaharamitu
+
+    Geo::Hex::V2::XS are originally written by lestrrat
+
+    Geo::Hex::V3 are originally written by soh335
 
 LICENCE AND COPYRIGHT
     GeoHex by @sa2da (http://geogames.net) is licensed under Creative
     Commons BY-SA 2.1 Japan License.
 
-    Copyright 2011 Makamaka Hannyaharamitu
+    Geo::Hex - Copyright 2011 Makamaka Hannyaharamitu
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
