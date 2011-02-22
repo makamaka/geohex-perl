@@ -354,7 +354,10 @@ OHTSUKA Ko-hei  C<< <nene@kokogiko.net> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2009-2010, OHTSUKA Ko-hei C<< <nene@kokogiko.net> >>. All rights reserved.
+GeoHex by @sa2da (http://geogames.net) is licensed under
+Creative Commons BY-SA 2.1 Japan License.
+
+Geo::Hex::V1 Copyright (c) 2009-2010, OHTSUKA Ko-hei C<< <nene@kokogiko.net> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

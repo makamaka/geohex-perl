@@ -217,6 +217,10 @@ Geo::Hex - GeoHex decoder/encoder
         # From hex code to center latitude/longitude
     my ( $center_lat, $center_lng, $level ) = geohex2latlng( $code );
 
+=head1 VERSION
+
+This is a beta version, so interfaces may be changed in future.
+
 =head1 CLASS METHODS
 
 =head2 new
@@ -260,6 +264,7 @@ Returns specification version.
 
 =head2 spec_version
 
+Returns specification version.
 
 =head1 EXPORT FUNCTIONS
 
@@ -295,9 +300,13 @@ Same as C<decode_geohex>.
 
     $zone = latlng2zone( $lat, $lon, $level );
 
+Takes a location and its level, and returns L<GeoHex::Zone>.
+
 =head2 geohex2zone
 
     $zone = geohex2zone( $code );
+
+Takes a geohex code and returns L<GeoHex::Zone>.
 
 =head1 SEE ALSO
 
@@ -309,20 +318,27 @@ L<Geo::Hex::V2>,
 L<Geo::Hex::V3>,
 L<Geo::Hex::Zone>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Makamaka Hannyaharamitu
+Frontend module L<Geo::Hex> by Makamaka Hannyaharamitu
+
+L<Geo::Hex::V1> are originally written by OHTSUKA Ko-hei  C<< <nene@kokogiko.net> >>
+
+L<Geo::Hex::V2> are originally written by OHTSUKA Ko-hei and maintained by Makamaka Hannyaharamitu
+
+L<Geo::Hex::V2::XS> are originally written by lestrrat
+
+L<Geo::Hex::V3> are originally written by soh335
 
 =head1 LICENCE AND COPYRIGHT
 
 GeoHex by @sa2da (http://geogames.net) is licensed under
 Creative Commons BY-SA 2.1 Japan License.
 
-Copyright 2011 Makamaka Hannyaharamitu
+Geo::Hex - Copyright 2011 Makamaka Hannyaharamitu
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
 
 =cut
 

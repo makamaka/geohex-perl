@@ -351,8 +351,7 @@ soh335
 GeoHex by @sa2da (http://geogames.net) is licensed under
 Creative Commons BY-SA 2.1 Japan License.
 
-Copyright 2011
-Geo::Hex::V3 - GeoHex perl implementation by soh335
+Geo::Hex::V3 Copyright (c) 2011 by soh335
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

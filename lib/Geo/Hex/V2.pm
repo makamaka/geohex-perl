@@ -390,10 +390,10 @@ Geo::Hex::V2 - Convert between latitude/longitude and GeoHex code (version 2:wor
     my ( $center_lat, $center_lng, $level ) = geohex2latlng( $code );
     
     # From latitude/longitude to zone object*
-    my $zone = getZoneByLocation( $lat, $lng, $level );
+    my $zone = latlng2zone( $lat, $lng, $level );
     
     # From hex code to zone object*
-    my $zone = getZoneByCode( $code );
+    my $zone = geohex2zone( $code );
 
     # * zone object: hash value
     # $zone->{code} : GeoHex code
@@ -415,12 +415,12 @@ $level is optional, and default value is 16.
 
 Convert GeoHex code to center latitude/longitude, and level value.
 
-=item C<< getZoneByLocation( $lat, $lng, $level ) >>
+=item C<< latlng2zone( $lat, $lng, $level ) >>
 
 Convert latitude/longitude to GeoHex zone object.
 $level is optional, and default value is 16.
 
-=item C<< getZoneByCode( $hex ) >>
+=item C<< geohex2zone( $hex ) >>
 
 Convert GeoHex code to GeoHex zone object.
 
@@ -438,34 +438,19 @@ Math::Trig
 
 OHTSUKA Ko-hei  C<< <nene@kokogiko.net> >>
 
+makamaka
 
-=head1 LICENCE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2009-2010, OHTSUKA Ko-hei C<< <nene@kokogiko.net> >>. All rights reserved.
+GeoHex by @sa2da (http://geogames.net) is licensed under
+Creative Commons BY-SA 2.1 Japan License.
 
-This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See L<perlartistic>.
+Geo::Hex::V2 Copyright (c) 2011 by makamaka
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 
-=head1 DISCLAIMER OF WARRANTY
+=cut
 
-BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
-OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
-EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
-YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-NECESSARY SERVICING, REPAIR, OR CORRECTION.
 
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
-LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
-OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
-THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGES.
