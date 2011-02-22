@@ -402,6 +402,12 @@ Geo::Hex::V2 - Convert between latitude/longitude and GeoHex code (version 2:wor
     # $zone->{x}    : Mercator X coordinate of given GeoHex's center point 
     # $zone->{y}    : Mercator Y coordinate of given GeoHex's center point 
 
+=head1 DESCRIPTION
+
+GeoHex version 2 decoder/encoder.
+
+If L<Geo::Hex::V2::XS> is installed, it will be used.
+
 =head1 EXPORT
 
 =over
@@ -426,13 +432,9 @@ Convert GeoHex code to GeoHex zone object.
 
 =back
 
+=head1 SEE ALSO
 
-=head1 DEPENDENCIES
-
-Exporter
-POSIX
-Math::Round
-Math::Trig
+L<Geo::Hex::V2::XS>
 
 =head1 AUTHOR
 
