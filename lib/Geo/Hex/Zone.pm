@@ -24,6 +24,7 @@ sub level { $_[0]->{level} }
 
 sub lng { $_[0]->lon }
 
+sub hex_coords { die "hex_coords must be implemented by subclass."; }
 
 1;
 __END__
